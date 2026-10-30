@@ -16,31 +16,18 @@
 <style>
 /* Layout: one calm column. Night-study look: deep indigo, soft glows, a pastel hue per shape. */
 :root{
-  /* light = soft lavender paper, never pure white */
-  --bg:#eceef8; --bg-glow1:rgba(124,92,255,.16); --bg-glow2:rgba(70,200,180,.12); --dots:rgba(40,50,110,.07);
-  --card:#f8f8fd; --card-2:#f1f2fa; --line:#dadeef; --shadow:0 10px 30px -18px rgba(40,40,110,.45);
-  --ink:#1d2142; --muted:#62698e;
-  --accent:#6d4dff; --accent-2:#e2669b; --on-accent:#ffffff;
-  --hl:#ffcf5c; --vol:#3fc1ae; --face:#d3d8ee; --hole:#eceef8;
+  /* single look: night study (deep indigo, pastel accents) */
+  --bg:#11142a; --bg-glow1:rgba(140,110,255,.22); --bg-glow2:rgba(80,210,190,.12); --dots:rgba(200,210,255,.05);
+  --card:#1a1e3c; --card-2:#20254a; --line:#2c325e; --shadow:0 14px 34px -20px rgba(0,0,0,.8);
+  --ink:#e9ebff; --muted:#a2a8d0;
+  --accent:#a48bff; --accent-2:#ff9cc6; --on-accent:#14172e;
+  --hl:#f7c96a; --vol:#5cd6c5; --face:#343b6c; --hole:#11142a;
   --font-display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
   --font-body:"Lexend",system-ui,-apple-system,"Segoe UI",sans-serif;
   --font-math:"STIX Two Text","Cambria Math","Times New Roman",serif;
-  --hue:#6d4dff;
+  --hue:#a48bff;
+  color-scheme:dark;
 }
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --bg:#11142a; --bg-glow1:rgba(140,110,255,.22); --bg-glow2:rgba(80,210,190,.12); --dots:rgba(200,210,255,.05);
-  --card:#1a1e3c; --card-2:#20254a; --line:#2c325e; --shadow:0 14px 34px -20px rgba(0,0,0,.8);
-  --ink:#e9ebff; --muted:#a2a8d0;
-  --accent:#a48bff; --accent-2:#ff9cc6; --on-accent:#14172e;
-  --hl:#f7c96a; --vol:#5cd6c5; --face:#343b6c; --hole:#11142a;
-  color-scheme:dark }}
-:root[data-theme="dark"]{
-  --bg:#11142a; --bg-glow1:rgba(140,110,255,.22); --bg-glow2:rgba(80,210,190,.12); --dots:rgba(200,210,255,.05);
-  --card:#1a1e3c; --card-2:#20254a; --line:#2c325e; --shadow:0 14px 34px -20px rgba(0,0,0,.8);
-  --ink:#e9ebff; --muted:#a2a8d0;
-  --accent:#a48bff; --accent-2:#ff9cc6; --on-accent:#14172e;
-  --hl:#f7c96a; --vol:#5cd6c5; --face:#343b6c; --hole:#11142a;
-  color-scheme:dark }
 
 *{box-sizing:border-box}
 html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);background:var(--bg)}
