@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Maths formulas app: Ch-14 Surface Area and Volume with diagrams, explanations and examples.">
 <title>Maths</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#182a4a">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Maths">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Atkinson+Hyperlegible:wght@400;700&family=STIX+Two+Text:ital,wght@0,500;1,500;1,600&display=swap">
 <style>
@@ -64,6 +70,9 @@ h1,h2,h3{font-family:var(--font-display);line-height:1.1;margin:0;text-wrap:bala
 .chbar[aria-expanded="true"] .chev{transform:rotate(180deg);background:var(--ink);color:var(--bg);border-color:var(--ink)}
 @media (prefers-reduced-motion:reduce){.chbar,.chev{transition:none}.chbar:hover{transform:none}}
 .hint{margin:0 0 12px;color:var(--muted)}
+.toprow{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.install{all:unset;cursor:pointer;background:var(--ink);color:var(--bg);font-weight:700;font-size:.9rem;border-radius:999px;padding:8px 16px}
+.install:focus-visible{outline:3px solid var(--vol);outline-offset:2px}
 /* Home grid */
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 @media (min-width:620px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
@@ -386,7 +395,7 @@ function home(open) {
     </button>`).join('');
   app.innerHTML = `
     <header class="chapter">
-      <h1>Maths</h1>
+      <div class="toprow"><h1>Maths</h1><button class="install" id="install" hidden>Install app</button></div>
       <p>Tap a chapter to open it.</p>
     </header>
     <button class="chbar" data-go="${open ? '' : 'ch14'}" aria-expanded="${open}" id="ch14">
@@ -485,6 +494,19 @@ app.addEventListener('click', e => {
 });
 window.addEventListener('hashchange', route);
 route();
+
+// Installable app: offline support + an Install button when the browser allows it
+let installEvt = null;
+const showInstall = () => { const b = document.getElementById('install'); if (b && installEvt) b.hidden = false; };
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; showInstall(); });
+window.addEventListener('hashchange', showInstall);
+document.addEventListener('click', e => {
+  if (e.target.id !== 'install' || !installEvt) return;
+  installEvt.prompt();
+  installEvt.userChoice.finally(() => { installEvt = null; e.target.hidden = true; });
+});
+window.addEventListener('appinstalled', () => { installEvt = null; const b = document.getElementById('install'); if (b) b.hidden = true; });
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
 </body>
 </html>
