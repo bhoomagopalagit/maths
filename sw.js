@@ -1,5 +1,5 @@
 // Offline support: keeps the app and its fonts on the phone after the first visit.
-const CACHE = 'maths-v3';
+const CACHE = 'maths-v4';
 const CORE = ['./', './index.html', './manifest.json', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', e => {

@@ -95,6 +95,14 @@ h1,h2,h3{font-family:var(--font-display);line-height:1.1;margin:0;text-wrap:bala
 .card.rev .num{color:var(--on-accent);background:rgba(255,255,255,.22)}
 .card.rev p{margin:0;font-size:.82rem;opacity:.85}
 .rev-mark{font-family:var(--font-math);font-style:italic;font-size:1.6rem;line-height:1.25;padding:10px 2px}
+.cardtop{display:flex;justify-content:space-between;align-items:center;gap:4px;flex-wrap:wrap}
+.tag{font-size:.62rem;font-weight:600;border-radius:999px;padding:1px 7px;white-space:nowrap}
+.tag-class9{background:var(--hl);color:#2a2105}
+.tag-basics{background:var(--card-2);color:var(--muted)}
+.tag-tricky{background:color-mix(in srgb,var(--accent-2) 22%,transparent);color:var(--accent-2)}
+.hint b{color:var(--ink);font-weight:600}
+.card.rev{grid-column:1/-1}
+@media (min-width:620px) and (max-width:799px){.card.rev{grid-column:auto}}
 @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
 /* Detail */
@@ -269,7 +277,7 @@ const DRAW = {
 
 // ---------- Content ----------
 const SHAPES = [
- { id:'cube', name:'Cube', vars:'<span class="m">a</span> = length of each side', draw:'cube',
+ { id:'cube', tag:'Basics', name:'Cube', vars:'<span class="m">a</span> = length of each side', draw:'cube',
    tabs:[
     {k:'lsa', short:'LSA', full:'Lateral Surface Area', lhs:'LSA', eq:'4a<sup>2</sup>',
      explain:'A cube has 6 square faces, and each face has area <span class="m">a</span> × <span class="m">a</span> = <span class="m">a</span>². "Lateral" means only the 4 side walls, leaving out the top and the bottom. So LSA = 4 × <span class="m">a</span>².',
@@ -281,7 +289,7 @@ const SHAPES = [
      explain:'Volume is the space inside. For any box it is length × breadth × height. In a cube all three are <span class="m">a</span>, so V = <span class="m">a</span> × <span class="m">a</span> × <span class="m">a</span> = <span class="m">a</span>³.',
      ex:{given:'Side a = 5 cm', steps:['V = a³','= 5 × 5 × 5'], ans:'V = 125 cm³'}}],
    note:'<b>Diagonal of a cube</b> = √3 <span class="m">a</span>'},
- { id:'cuboid', name:'Cuboid', vars:'<span class="m">l</span> = length, <span class="m">b</span> = breadth, <span class="m">h</span> = height', draw:'cuboid',
+ { id:'cuboid', tag:'Basics', name:'Cuboid', vars:'<span class="m">l</span> = length, <span class="m">b</span> = breadth, <span class="m">h</span> = height', draw:'cuboid',
    tabs:[
     {k:'lsa', short:'LSA', full:'Lateral Surface Area', lhs:'LSA', eq:'2h(l + b)',
      explain:'The 4 side walls are two rectangles of <span class="m">l</span> × <span class="m">h</span> and two of <span class="m">b</span> × <span class="m">h</span>. Adding them: 2<span class="m">lh</span> + 2<span class="m">bh</span> = 2<span class="m">h</span>(<span class="m">l</span> + <span class="m">b</span>). Think of it as the perimeter of the base × height (like painting the 4 walls of a room).',
@@ -293,7 +301,7 @@ const SHAPES = [
      explain:'Base area (<span class="m">l</span> × <span class="m">b</span>) tells you how many unit cubes fit in one layer. Multiply by the height to count all the layers.',
      ex:{given:'l = 10 cm, b = 6 cm, h = 4 cm', steps:['V = l × b × h','= 10 × 6 × 4'], ans:'V = 240 cm³'}}],
    note:'<b>Diagonal of a cuboid</b> = √(<span class="m">l</span>² + <span class="m">b</span>² + <span class="m">h</span>²)'},
- { id:'cylinder', name:'Cylinder', vars:'<span class="m">r</span> = radius of base, <span class="m">h</span> = height', draw:'cylinder',
+ { id:'cylinder', tag:'Basics', name:'Cylinder', vars:'<span class="m">r</span> = radius of base, <span class="m">h</span> = height', draw:'cylinder',
    tabs:[
     {k:'lsa', short:'CSA', full:'Curved Surface Area', lhs:'CSA', eq:'2πrh',
      explain:'Peel the label off a can and open it flat: it becomes a rectangle. Its length is the circumference of the base, 2π<span class="m">r</span>, and its width is the height <span class="m">h</span>. Area = 2π<span class="m">r</span> × <span class="m">h</span>.',
@@ -304,7 +312,7 @@ const SHAPES = [
     {k:'vol', short:'Volume', full:'Volume', lhs:'V', eq:'πr<sup>2</sup>h',
      explain:'Same idea as a box: base area × height. The base is a circle of area π<span class="m">r</span>², so V = π<span class="m">r</span>² × <span class="m">h</span>.',
      ex:{given:'r = 7 cm, h = 10 cm', steps:['V = πr²h','= 22/7 × 7 × 7 × 10','= 154 × 10'], ans:'V = 1540 cm³'}}]},
- { id:'hollow-cylinder', name:'Hollow Cylinder', vars:'<span class="m">R</span> = outer radius, <span class="m">r</span> = inner radius, <span class="m">h</span> = height', draw:'hollow',
+ { id:'hollow-cylinder', tag:'Tricky', name:'Hollow Cylinder', vars:'<span class="m">R</span> = outer radius, <span class="m">r</span> = inner radius, <span class="m">h</span> = height', draw:'hollow',
    tabs:[
     {k:'lsa', short:'CSA', full:'Curved Surface Area', lhs:'CSA', eq:'2π(R + r)h',
      explain:'A pipe has two curved surfaces: the outside (2π<span class="m">Rh</span>) and the inside (2π<span class="m">rh</span>). Add them: 2π(<span class="m">R</span> + <span class="m">r</span>)<span class="m">h</span>.',
@@ -315,7 +323,7 @@ const SHAPES = [
     {k:'vol', short:'Volume', full:'Volume of material', lhs:'V', eq:'πh(R<sup>2</sup> − r<sup>2</sup>)',
      explain:'Volume of the full outer cylinder minus the volume of the hole: π<span class="m">R</span>²<span class="m">h</span> − π<span class="m">r</span>²<span class="m">h</span>.',
      ex:{given:'R = 7 cm, r = 3.5 cm, h = 10 cm', steps:['V = πh(R² − r²)','= 22/7 × 10 × 36.75'], ans:'V = 1155 cm³'}}]},
- { id:'cone', name:'Cone', vars:'<span class="m">r</span> = radius, <span class="m">h</span> = height, <span class="m">l</span> = slant height', draw:'cone',
+ { id:'cone', tag:'Class 9', name:'Cone', vars:'<span class="m">r</span> = radius, <span class="m">h</span> = height, <span class="m">l</span> = slant height', draw:'cone',
    tabs:[
     {k:'lsa', short:'CSA', full:'Curved Surface Area', lhs:'CSA', eq:'πrl',
      explain:'Cut a cone open along its side and it flattens into a sector of a circle with radius <span class="m">l</span>. Its area works out to π<span class="m">rl</span>. Note it uses the slant height <span class="m">l</span>, not the height <span class="m">h</span>.',
@@ -327,7 +335,7 @@ const SHAPES = [
      explain:'A cone holds exactly one-third of a cylinder with the same base and height. Fill a cone with water 3 times and you fill the cylinder. Use the height <span class="m">h</span> here, not <span class="m">l</span>.',
      ex:{given:'r = 7 cm, h = 24 cm', steps:['V = ⅓ × 22/7 × 7 × 7 × 24','= ⅓ × 154 × 24'], ans:'V = 1232 cm³'}}],
    note:'<b>Slant height</b> <span class="m">l</span> = √(<span class="m">r</span>² + <span class="m">h</span>²), from Pythagoras'},
- { id:'sphere', name:'Sphere', vars:'<span class="m">r</span> = radius', draw:'sphere',
+ { id:'sphere', tag:'Class 9', name:'Sphere', vars:'<span class="m">r</span> = radius', draw:'sphere',
    tabs:[
     {k:'tsa', short:'Surface', full:'Surface Area', lhs:'SA', eq:'4πr<sup>2</sup>',
      explain:'A sphere has one curved surface, so CSA = TSA. Its area equals exactly 4 circles of the same radius (4 × π<span class="m">r</span>²).',
@@ -335,7 +343,7 @@ const SHAPES = [
     {k:'vol', short:'Volume', full:'Volume', lhs:'V', eq:'⁴⁄₃ πr<sup>3</sup>',
      explain:'The volume grows with the cube of the radius. Double the radius and the volume becomes 8 times bigger.',
      ex:{given:'r = 7 cm', steps:['V = 4/3 × 22/7 × 343','= 4/3 × 1078'], ans:'V ≈ 1437.33 cm³'}}]},
- { id:'hemisphere', name:'Hemisphere', vars:'<span class="m">r</span> = radius', draw:'hemi',
+ { id:'hemisphere', tag:'Class 9', name:'Hemisphere', vars:'<span class="m">r</span> = radius', draw:'hemi',
    tabs:[
     {k:'lsa', short:'CSA', full:'Curved Surface Area', lhs:'CSA', eq:'2πr<sup>2</sup>',
      explain:'Half of a sphere, so half of 4π<span class="m">r</span>²: the dome alone is 2π<span class="m">r</span>².',
@@ -346,7 +354,7 @@ const SHAPES = [
     {k:'vol', short:'Volume', full:'Volume', lhs:'V', eq:'⅔ πr<sup>3</sup>',
      explain:'Half of the sphere\'s volume: ½ × ⁴⁄₃π<span class="m">r</span>³ = ⅔π<span class="m">r</span>³.',
      ex:{given:'r = 7 cm', steps:['V = 2/3 × 22/7 × 343','= 2/3 × 1078'], ans:'V ≈ 718.67 cm³'}}]},
- { id:'spherical-shell', name:'Spherical Shell', vars:'<span class="m">R</span> = outer radius, <span class="m">r</span> = inner radius', draw:'shell',
+ { id:'spherical-shell', tag:'Tricky', name:'Spherical Shell', vars:'<span class="m">R</span> = outer radius, <span class="m">r</span> = inner radius', draw:'shell',
    tabs:[
     {k:'tsa', short:'Surface', full:'Outer and Inner Surface', lhs:'SA', eq:'4πR<sup>2</sup> , 4πr<sup>2</sup>',
      explain:'A hollow ball (cut open in the picture) has an outer surface 4π<span class="m">R</span>² and an inner surface 4π<span class="m">r</span>². Questions usually ask for the outer one.',
@@ -354,40 +362,6 @@ const SHAPES = [
     {k:'vol', short:'Volume', full:'Volume of material', lhs:'V', eq:'⁴⁄₃ π(R<sup>3</sup> − r<sup>3</sup>)',
      explain:'The big sphere minus the hollow sphere inside: ⁴⁄₃π<span class="m">R</span>³ − ⁴⁄₃π<span class="m">r</span>³.',
      ex:{given:'R = 7 cm, r = 3.5 cm', steps:['R³ − r³ = 343 − 42.875 = 300.125','V = 4/3 × 22/7 × 300.125'], ans:'V ≈ 1257.67 cm³'}}]},
- { id:'frustum', name:'Frustum of a Cone', vars:'<span class="m">R</span>, <span class="m">r</span> = radii of the ends, <span class="m">h</span> = height, <span class="m">l</span> = slant height', draw:'frustum',
-   tabs:[
-    {k:'lsa', short:'CSA', full:'Curved Surface Area', lhs:'CSA', eq:'π(R + r)l',
-     explain:'A frustum is a cone with its top sliced off, like a bucket or a glass. Its curved surface is π(<span class="m">R</span> + <span class="m">r</span>)<span class="m">l</span>.',
-     ex:{given:'R = 10 cm, r = 4 cm, h = 8 cm', steps:['l = √(8² + 6²) = 10 cm','CSA = 22/7 × 14 × 10'], ans:'CSA = 440 cm²'}},
-    {k:'tsa', short:'TSA', full:'Total Surface Area', lhs:'TSA', eq:'π(R + r)l + πR<sup>2</sup> + πr<sup>2</sup>',
-     explain:'Curved surface plus both circular ends. For an open bucket, leave out the top circle πR².',
-     ex:{given:'R = 10 cm, r = 4 cm, l = 10 cm', steps:['Curved = 440 cm²','Ends = 22/7 × (100 + 16) ≈ 364.57 cm²'], ans:'TSA ≈ 804.57 cm²'}},
-    {k:'vol', short:'Volume', full:'Volume', lhs:'V', eq:'⅓ πh(R<sup>2</sup> + r<sup>2</sup> + Rr)',
-     explain:'It is the big cone minus the small cone that was cut off. Simplifying that gives this formula.',
-     ex:{given:'R = 10 cm, r = 4 cm, h = 8 cm', steps:['R² + r² + Rr = 100 + 16 + 40 = 156','V = ⅓ × 22/7 × 8 × 156'], ans:'V ≈ 1307.43 cm³'}}],
-   note:'<b>Slant height</b> <span class="m">l</span> = √(<span class="m">h</span>² + (<span class="m">R</span> − <span class="m">r</span>)²)'},
- { id:'prism', name:'Prism', vars:'<span class="m">h</span> = length (height) of the prism', draw:'prism',
-   tabs:[
-    {k:'lsa', short:'LSA', full:'Lateral Surface Area', lhs:'LSA', eq:'perimeter of base × h',
-     explain:'The side faces are rectangles, one for each edge of the base. Laid side by side they form one long rectangle: base perimeter × height.',
-     ex:{given:'Triangle base with sides 3, 4, 5 cm; h = 10 cm', steps:['Perimeter = 3 + 4 + 5 = 12 cm','LSA = 12 × 10'], ans:'LSA = 120 cm²'}},
-    {k:'tsa', short:'TSA', full:'Total Surface Area', lhs:'TSA', eq:'LSA + 2 × base area',
-     explain:'Add the two matching ends (front and back) to the side faces.',
-     ex:{given:'Same prism; base area = ½ × 3 × 4 = 6 cm²', steps:['TSA = 120 + 2 × 6'], ans:'TSA = 132 cm²'}},
-    {k:'vol', short:'Volume', full:'Volume', lhs:'V', eq:'base area × h',
-     explain:'Every prism (cube, cuboid and cylinder too) follows this rule: area of the end shape × length.',
-     ex:{given:'Base area = 6 cm², h = 10 cm', steps:['V = 6 × 10'], ans:'V = 60 cm³'}}]},
- { id:'pyramid', name:'Pyramid', vars:'<span class="m">h</span> = height, <span class="m">l</span> = slant height', draw:'pyramid',
-   tabs:[
-    {k:'lsa', short:'LSA', full:'Lateral Surface Area', lhs:'LSA', eq:'½ × perimeter × l',
-     explain:'Each side face is a triangle with base = one edge and height = slant height <span class="m">l</span>. Adding all the triangles gives ½ × base perimeter × <span class="m">l</span>.',
-     ex:{given:'Square base 10 cm, h = 12 cm', steps:['l = √(12² + 5²) = 13 cm','LSA = ½ × 40 × 13'], ans:'LSA = 260 cm²'}},
-    {k:'tsa', short:'TSA', full:'Total Surface Area', lhs:'TSA', eq:'LSA + base area',
-     explain:'Side triangles plus the one base at the bottom.',
-     ex:{given:'LSA = 260 cm², base = 10 × 10', steps:['TSA = 260 + 100'], ans:'TSA = 360 cm²'}},
-    {k:'vol', short:'Volume', full:'Volume', lhs:'V', eq:'⅓ × base area × h',
-     explain:'Like the cone, a pyramid holds one-third of the prism with the same base and height.',
-     ex:{given:'Base = 100 cm², h = 12 cm', steps:['V = ⅓ × 100 × 12'], ans:'V = 400 cm³'}}]}
 ];
 
 // ---------- Views ----------
@@ -401,7 +375,7 @@ function home(open) {
   app.style.removeProperty('--hue');
   const cards = SHAPES.map((s, i) => `
     <button class="card" data-go="${s.id}" aria-label="${s.name}" style="--hue:${hueOf(i)};--i:${i}">
-      <span class="num">Formula ${i + 1}</span>
+      <span class="cardtop"><span class="num">Formula ${i + 1}</span><span class="tag tag-${s.tag.replace(' ','').toLowerCase()}">${s.tag}</span></span>
       ${wrap(DRAW[s.draw](null), s.name)}
       <h3>${s.name}</h3>
       <span class="chips">${s.tabs.map(t => `<span class="chip">${t.short}</span>`).join('')}</span>
@@ -414,10 +388,10 @@ function home(open) {
     <button class="chbar" data-go="${open ? '' : 'ch14'}" aria-expanded="${open}">
       <span class="chno"><small>Ch</small><b>14</b></span>
       <span class="chname">Surface Area and Volume</span>
-      <span class="chmeta">${SHAPES.length} shapes <i>CSA · TSA · Volume</i></span>
+      <span class="chmeta">${SHAPES.length} shapes <i>Class 9</i></span>
       <span class="chev" aria-hidden="true">▼</span>
     </button>
-    ${open ? `<p class="hint">Tap a shape to see its formulas with a diagram and explanation.</p>
+    ${open ? `<p class="hint">Tap a shape to see its formulas. <b>Class 9</b> = exam focus · <b>Basics</b> = used inside questions · <b>Tricky</b> = shapes with a hole or thickness.</p>
     <div class="grid">${cards}
       <button class="card rev" data-go="revision" aria-label="Quick revision" style="--i:${SHAPES.length}">
         <span class="num">All shapes</span>
@@ -438,7 +412,7 @@ function detail(s) {
   app.innerHTML = `
     <button class="back" data-go="ch14">← Ch–14 shapes</button>
     <header class="dhead">
-      <span class="eyebrow">Formula ${idx + 1} of ${SHAPES.length}</span>
+      <span class="eyebrow">Formula ${idx + 1} of ${SHAPES.length} · ${s.tag}</span>
       <h2>${s.name}</h2>
       <div class="vars">${s.vars}</div>
     </header>
