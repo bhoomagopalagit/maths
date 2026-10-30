@@ -16,6 +16,25 @@ android {
         versionName "1.${buildNumber}"
     }
 
+    // One fixed key (from the repo's private secrets), so every new APK installs as an update.
+    // Without the secrets, builds fall back to a throwaway debug key.
+    def keyFile = file('../signing/maths.keystore')
+    def keyPass = System.getenv('MATHS_KEY_PASSWORD') ?: ''
+    signingConfigs {
+        shared {
+            storeFile keyFile
+            storePassword keyPass
+            keyAlias 'maths'
+            keyPassword keyPass
+        }
+    }
+
+    buildTypes {
+        debug {
+            if (keyFile.exists() && keyPass) signingConfig signingConfigs.shared
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17

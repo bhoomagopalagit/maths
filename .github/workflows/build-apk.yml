@@ -29,10 +29,23 @@ jobs:
           cp index.html manifest.json android/app/src/main/assets/
           cp -r icons android/app/src/main/assets/
 
+      - name: Use the saved signing key (if it is set up)
+        env:
+          KEYSTORE_B64: ${{ secrets.MATHS_KEYSTORE_B64 }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            mkdir -p android/signing
+            echo "$KEYSTORE_B64" | base64 -d > android/signing/maths.keystore
+            echo "Signing with the saved key"
+          else
+            echo "No saved key yet: using a temporary one"
+          fi
+
       - name: Build the APK
         working-directory: android
         env:
           VERSION_CODE: ${{ github.run_number }}
+          MATHS_KEY_PASSWORD: ${{ secrets.MATHS_KEY_PASSWORD }}
         run: gradle assembleDebug --no-daemon
 
       - name: Name it Maths.apk
@@ -53,3 +66,15 @@ jobs:
           body: |
             Download **Maths.apk** below and open it on your Android phone.
             If Android asks, allow "Install unknown apps" for your browser or Files app.
+
+      - name: Remove older APK releases (keep only the newest)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NEW_TAG: apk-v1.${{ github.run_number }}
+        run: |
+          gh release list --limit 100 --json tagName --jq '.[].tagName' \
+            | grep '^apk-v' | grep -vx "$NEW_TAG" \
+            | while read -r tag; do
+                echo "Deleting $tag"
+                gh release delete "$tag" --cleanup-tag --yes
+              done
