@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Maths formulas app: Ch-14 Surface Area and Volume with diagrams, explanations and examples.">
+<title>Maths</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Atkinson+Hyperlegible:wght@400;700&family=STIX+Two+Text:ital,wght@0,500;1,500;1,600&display=swap">
+<style>
+/* Layout: one narrow column on blue graph paper; home = grid of shape cards, detail = diagram → formula → explanation */
+:root{
+  --bg:#f3f6fb; --grid:rgba(60,100,170,.09); --card:#ffffff; --line:#d6dfec;
+  --ink:#182a4a; --muted:#56657f;
+  --accent:#c8314a;          /* red-ink dimension lines and labels */
+  --hl:#ffcf3d;              /* marker yellow: surfaces counted */
+  --face:#cfdcee;            /* surfaces not counted */
+  --vol:#4fb3c4;             /* space inside */
+  --hole:#f3f6fb;
+  --font-display:"Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  --font-body:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-math:"STIX Two Text", "Cambria Math", "Times New Roman", serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0e1524; --grid:rgba(140,170,230,.07); --card:#162036; --line:#26344f;
+  --ink:#e4ebf7; --muted:#9aa8c2; --accent:#ff7d8f; --hl:#e9b726; --face:#33425f; --vol:#2f98aa; --hole:#0e1524;
+  color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0e1524; --grid:rgba(140,170,230,.07); --card:#162036; --line:#26344f;
+  --ink:#e4ebf7; --muted:#9aa8c2; --accent:#ff7d8f; --hl:#e9b726; --face:#33425f; --vol:#2f98aa; --hole:#0e1524;
+  color-scheme:dark }
+
+*{box-sizing:border-box}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+body{
+  background-color:var(--bg); color:var(--ink); font-family:var(--font-body); font-size:16px; line-height:1.55;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:22px 22px;
+}
+.wrap{max-width:820px;margin:0 auto;padding-block:20px 48px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px))}
+h1,h2,h3{font-family:var(--font-display);line-height:1.1;margin:0;text-wrap:balance}
+.eyebrow{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.chapter{display:flex;flex-direction:column;gap:6px;margin-bottom:20px}
+.chapter h1{font-size:clamp(2rem,7vw,2.8rem);font-weight:800}
+.chapter p{margin:0;color:var(--muted)}
+
+.chbar{all:unset;box-sizing:border-box;cursor:pointer;width:100%;display:grid;grid-template-columns:auto 1fr auto;grid-template-areas:"no name chev" "no meta chev";align-items:center;column-gap:14px;
+  border:1.5px solid var(--line);border-radius:16px;background:var(--card);padding:14px 16px;margin-bottom:16px;
+  box-shadow:0 1px 0 var(--line),0 6px 18px -12px rgba(24,42,74,.35);transition:border-color .15s,transform .15s}
+.chbar:hover{border-color:var(--ink);transform:translateY(-1px)}
+.chbar:focus-visible{outline:3px solid var(--vol);outline-offset:3px}
+.chbar[aria-expanded="true"]{border-color:var(--ink)}
+.chno{grid-area:no;display:flex;flex-direction:column;align-items:center;justify-content:center;width:58px;height:58px;border-radius:14px;background:var(--ink);color:var(--bg);font-family:var(--font-display);line-height:1}
+.chno small{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.75}
+.chno b{font-size:1.6rem;font-weight:800}
+.chname{grid-area:name;font-family:var(--font-display);font-weight:800;font-size:clamp(1.25rem,5vw,1.7rem);line-height:1.1;color:var(--ink);min-width:0;align-self:end}
+.chmeta{grid-area:meta;font-size:.85rem;color:var(--muted);align-self:start;display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.chmeta i{font-style:normal;background:color-mix(in srgb,var(--hl) 35%,transparent);color:var(--ink);border-radius:999px;padding:0 8px;font-weight:700;font-size:.75rem}
+.chev{grid-area:chev;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--line);color:var(--ink);font-size:.75rem;transition:transform .2s}
+.chbar[aria-expanded="true"] .chev{transform:rotate(180deg);background:var(--ink);color:var(--bg);border-color:var(--ink)}
+@media (prefers-reduced-motion:reduce){.chbar,.chev{transition:none}.chbar:hover{transform:none}}
+.hint{margin:0 0 12px;color:var(--muted)}
+/* Home grid */
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (min-width:620px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (min-width:800px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.card{all:unset;box-sizing:border-box;cursor:pointer;background:var(--card);border:1.5px solid var(--line);border-radius:14px;
+  padding:10px 12px 12px;display:flex;flex-direction:column;gap:4px;transition:transform .15s,border-color .15s}
+.card:hover{border-color:var(--ink);transform:translateY(-2px)}
+.card:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.card svg{width:100%;height:auto;display:block}
+.card .num{font-size:.72rem;color:var(--muted);font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.card h3{font-size:1.2rem;font-weight:700}
+.card .chips{display:flex;gap:4px;flex-wrap:wrap;margin-top:2px}
+.chip{font-size:.7rem;font-weight:700;border:1px solid var(--line);border-radius:999px;padding:1px 7px;color:var(--muted)}
+.card.rev{background:var(--ink);color:var(--bg);border-color:var(--ink);justify-content:space-between}
+.card.rev .num,.card.rev p{color:var(--bg);opacity:.75}
+.card.rev p{margin:0;font-size:.85rem}
+.rev-mark{font-family:var(--font-math);font-style:italic;font-size:1.7rem;line-height:1.2;padding:10px 2px}
+
+/* Detail */
+.back{all:unset;cursor:pointer;font-weight:700;color:var(--accent);display:inline-flex;align-items:center;gap:6px;padding:6px 0;margin-bottom:6px}
+.back:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+.dhead{display:flex;flex-direction:column;gap:4px;margin-bottom:14px}
+.dhead h2{font-size:clamp(1.9rem,6.5vw,2.5rem);font-weight:800}
+.dhead .vars{color:var(--muted);font-size:.95rem}
+.m{font-family:var(--font-math);font-style:italic;font-weight:500}
+
+.tabs{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:5px;margin-bottom:14px}
+.tab{all:unset;cursor:pointer;text-align:center;border-radius:10px;padding:9px 6px;font-family:var(--font-display);font-weight:700;font-size:1.05rem;line-height:1.1}
+.tab small{display:block;font-family:var(--font-body);font-weight:400;font-size:.68rem;opacity:.75;margin-top:2px}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+.tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.panel{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:16px}
+.fig{display:flex;flex-direction:column;align-items:center;gap:8px}
+.fig svg{width:100%;max-width:380px;height:auto}
+.legend{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;font-size:.82rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:14px;border-radius:3px;border:1px solid var(--ink);display:inline-block}
+.sw.on{background:var(--hl)} .sw.off{background:var(--face)} .sw.vol{background:var(--vol)}
+
+.formula{border-top:1.5px dashed var(--line);padding-top:14px;text-align:center}
+.formula .name{font-size:.82rem;text-transform:uppercase;letter-spacing:.08em;font-weight:700;color:var(--muted)}
+.formula .eq{font-family:var(--font-math);font-size:clamp(1.8rem,7vw,2.5rem);font-style:italic;font-weight:500;margin-top:4px;overflow-x:auto}
+.formula .eq .lhs{font-style:normal;font-family:var(--font-display);font-weight:700;font-size:.75em;margin-right:.2em}
+.section h3{font-size:1.15rem;margin-bottom:4px}
+.section p{margin:0 0 6px}
+.example{background:color-mix(in srgb,var(--hl) 16%,transparent);border:1.5px solid color-mix(in srgb,var(--hl) 60%,var(--line));border-radius:12px;padding:12px 14px}
+.example h3{font-size:1.05rem;margin-bottom:6px}
+.example ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:2px}
+.example .ans{font-weight:700;margin-top:6px}
+.note{font-size:.92rem;color:var(--muted);border-left:3px solid var(--accent);padding-left:10px}
+.note b{color:var(--ink)}
+.pager{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
+.pager button{all:unset;cursor:pointer;font-weight:700;color:var(--ink);border:1.5px solid var(--line);background:var(--card);border-radius:10px;padding:8px 12px;font-size:.9rem}
+.pager button:focus-visible{outline:2px solid var(--accent)}
+.pager .sp{flex:1}
+
+/* Revision table */
+.tbl{overflow-x:auto;background:var(--card);border:1.5px solid var(--line);border-radius:14px}
+table{border-collapse:collapse;width:100%;min-width:560px}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--font-display);font-size:1rem}
+td.f{font-family:var(--font-math);font-style:italic;font-size:1.05rem;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+td button{all:unset;cursor:pointer;font-weight:700;color:var(--accent)}
+
+/* SVG */
+.st{stroke:var(--ink);stroke-width:1.6;stroke-linejoin:round}
+.nost{stroke:none}
+.f-off{fill:var(--face);fill-opacity:.6}
+.f-on{fill:var(--hl);fill-opacity:.72}
+.f-vol{fill:var(--vol);fill-opacity:.55}
+.hole{fill:var(--hole)}
+.eh{stroke:var(--ink);stroke-dasharray:4 4;stroke-opacity:.55;stroke-width:1.3;fill:none}
+.dim{stroke:var(--accent);stroke-width:1.6;stroke-dasharray:5 3;fill:none}
+.lbl{fill:var(--accent);font-family:var(--font-math);font-style:italic;font-weight:600;font-size:17px;text-anchor:middle}
+.lbl.sm{font-size:12px;font-style:normal;font-family:var(--font-body)}
+.dot{fill:var(--accent)}
+.card .lbl{font-size:15px}
+
+@media (prefers-reduced-motion:reduce){.card{transition:none}.card:hover{transform:none}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+// ---------- SVG helpers ----------
+const P = a => a.map(p => p.join(',')).join(' ');
+const pg = (pts, cls) => `<polygon points="${P(pts)}" class="${cls}"/>`;
+const ln = (a, b, cls) => `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" class="${cls}"/>`;
+const tx = (x, y, t, cls='lbl') => `<text x="${x}" y="${y}" class="${cls}">${t}</text>`;
+const pa = (d, cls) => `<path d="${d}" class="${cls}"/>`;
+const el = (cx, cy, rx, ry, cls) => `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" class="${cls}"/>`;
+const dot = (x, y) => `<circle cx="${x}" cy="${y}" r="2.6" class="dot"/>`;
+const fc = (mode, counts) => mode === 'vol' ? 'f-vol' : (mode && counts.includes(mode)) ? 'f-on' : 'f-off';
+const wrap = (inner, label) => `<svg viewBox="0 0 240 200" role="img" aria-label="${label}">${inner}</svg>`;
+
+function box(m, A, B, C, D, dx, dy, labels) {
+  const s = p => [p[0] + dx, p[1] + dy];
+  const A2 = s(A), B2 = s(B), C2 = s(C), D2 = s(D);
+  return pg([D, C, C2, D2], fc(m, ['tsa']) + ' nost') +
+    pg([A2, B2, C2, D2], fc(m, ['lsa', 'tsa']) + ' nost') +
+    pg([A, A2, D2, D], fc(m, ['lsa', 'tsa']) + ' nost') +
+    ln(D2, A2, 'eh') + ln(D2, C2, 'eh') + ln(D2, D, 'eh') +
+    pg([A, B, C, D], fc(m, ['lsa', 'tsa']) + ' st') +
+    pg([B, B2, C2, C], fc(m, ['lsa', 'tsa']) + ' st') +
+    pg([A, A2, B2, B], fc(m, ['tsa']) + ' st') + labels;
+}
+
+const DRAW = {
+  cube: m => box(m, [60,75],[150,75],[150,165],[60,165], 45,-40,
+    tx(105,186,'a') + tx(44,126,'a') + tx(184,156,'a')),
+  cuboid: m => box(m, [35,85],[165,85],[165,165],[35,165], 40,-35,
+    tx(100,186,'l') + tx(20,130,'h') + tx(196,158,'b')),
+  cylinder: m =>
+    el(120,160,60,16, fc(m,['tsa'])+' nost') + pa('M60,160 A60,16 0 0 1 180,160','eh') +
+    pa('M60,50 L60,160 A60,16 0 0 0 180,160 L180,50 A60,16 0 0 1 60,50 Z', fc(m,['lsa','tsa'])+' st') +
+    el(120,50,60,16, fc(m,['tsa'])+' st') +
+    ln([120,50],[180,50],'dim') + dot(120,50) + tx(150,44,'r') +
+    ln([200,50],[200,160],'dim') + tx(212,110,'h'),
+  hollow: m =>
+    pa('M55,160 A65,17 0 0 1 185,160 A65,17 0 0 1 55,160 Z M88,160 A32,8.5 0 0 0 152,160 A32,8.5 0 0 0 88,160 Z', fc(m,['tsa'])+' nost') +
+    pa('M55,160 A65,17 0 0 1 185,160','eh') +
+    pa('M88,50 L88,160 A32,8.5 0 0 0 152,160 L152,50 Z', (m==='vol' ? 'hole' : fc(m,['lsa','tsa']))+' nost') +
+    ln([88,50],[88,160],'eh') + ln([152,50],[152,160],'eh') + pa('M88,160 A32,8.5 0 0 0 152,160','eh') +
+    pa('M55,50 L55,160 A65,17 0 0 0 185,160 L185,50 A65,17 0 0 1 55,50 Z', fc(m,['lsa','tsa'])+' st') +
+    pa('M55,50 A65,17 0 0 1 185,50 A65,17 0 0 1 55,50 Z M88,50 A32,8.5 0 0 0 152,50 A32,8.5 0 0 0 88,50 Z', fc(m,['tsa'])+' st') +
+    `<path d="M88,50 A32,8.5 0 0 0 152,50 A32,8.5 0 0 0 88,50 Z" class="${m==='vol'?'hole':'hole'}" style="fill-opacity:.55"/>` +
+    el(120,50,32,8.5,'st') +
+    ln([120,50],[185,50],'dim') + ln([120,50],[88,50],'dim') + dot(120,50) +
+    tx(198,55,'R') + tx(104,44,'r') +
+    ln([36,50],[36,160],'dim') + tx(24,110,'h'),
+  cone: m =>
+    el(120,160,65,16, fc(m,['tsa'])+' nost') + pa('M55,160 A65,16 0 0 1 185,160','eh') +
+    pa('M55,160 L120,28 L185,160 A65,16 0 0 1 55,160 Z', fc(m,['lsa','tsa'])+' st') +
+    ln([120,28],[120,160],'dim') + ln([120,160],[185,160],'dim') + dot(120,160) +
+    tx(128,112,'h') + tx(152,156,'r') + tx(166,90,'l'),
+  sphere: m =>
+    `<circle cx="120" cy="100" r="72" class="${fc(m,['tsa'])} st"/>` +
+    pa('M48,100 A72,18 0 0 1 192,100','eh') + pa('M48,100 A72,18 0 0 0 192,100','st') +
+    ln([120,100],[192,100],'dim') + dot(120,100) + tx(156,94,'r'),
+  hemi: m =>
+    el(120,135,72,18, fc(m,['tsa'])+' nost') + pa('M48,135 A72,18 0 0 1 192,135','eh') +
+    pa('M48,135 A72,72 0 0 1 192,135 A72,18 0 0 1 48,135 Z', fc(m,['lsa','tsa'])+' st') +
+    ln([120,135],[192,135],'dim') + dot(120,135) + tx(156,129,'r'),
+  shell: m =>
+    pa('M45,100 A75,75 0 1 1 195,100 A75,75 0 1 1 45,100 Z M80,100 A40,40 0 1 0 160,100 A40,40 0 1 0 80,100 Z',
+       (m==='vol' ? 'f-vol' : m ? 'f-on' : 'f-off') + ' st') +
+    `<circle cx="120" cy="100" r="40" class="hole st" style="${m==='tsa'?'stroke:var(--ink);stroke-width:2.4':''}"/>` +
+    ln([120,100],[195,100],'dim') + ln([120,100],[80,100],'dim') + dot(120,100) +
+    tx(178,94,'R') + tx(100,94,'r'),
+  frustum: m =>
+    el(120,160,70,18, fc(m,['tsa'])+' nost') + pa('M50,160 A70,18 0 0 1 190,160','eh') +
+    pa('M85,50 L50,160 A70,18 0 0 0 190,160 L155,50 A35,9 0 0 1 85,50 Z', fc(m,['lsa','tsa'])+' st') +
+    el(120,50,35,9, fc(m,['tsa'])+' st') +
+    ln([120,50],[120,160],'dim') + ln([120,50],[155,50],'dim') + ln([120,160],[190,160],'dim') +
+    dot(120,50) + dot(120,160) +
+    tx(140,34,'r') + tx(158,155,'R') + tx(128,112,'h') + tx(184,100,'l'),
+  prism: m => {
+    const F1=[45,165],F2=[125,165],F3=[85,95], d=[75,-45], s=p=>[p[0]+d[0],p[1]+d[1]];
+    const B1=s(F1),B2=s(F2),B3=s(F3);
+    return pg([B1,B2,B3], fc(m,['tsa'])+' nost') +
+      pg([F1,F2,B2,B1], fc(m,['lsa','tsa'])+' nost') +
+      pg([F1,F3,B3,B1], fc(m,['lsa','tsa'])+' nost') +
+      ln(F1,B1,'eh') + ln(B1,B2,'eh') + ln(B1,B3,'eh') +
+      pg([F1,F2,F3], fc(m,['tsa'])+' st') +
+      pg([F2,B2,B3,F3], fc(m,['lsa','tsa'])+' st') +
+      ln(F3,B3,'st') +
+      tx(85,150,'base','lbl sm') + tx(176,152,'h');
+  },
+  pyramid: m => {
+    const P1=[45,165],P2=[155,165],P3=[200,130],P4=[90,130],T=[122,30];
+    return pg([P1,P2,P3,P4], fc(m,['tsa'])+' nost') +
+      pg([P3,P4,T], fc(m,['lsa','tsa'])+' nost') +
+      pg([P4,P1,T], fc(m,['lsa','tsa'])+' nost') +
+      ln(P4,P1,'eh') + ln(P4,P3,'eh') + ln(P4,T,'eh') +
+      pg([P1,P2,T], fc(m,['lsa','tsa'])+' st') +
+      pg([P2,P3,T], fc(m,['lsa','tsa'])+' st') +
+      ln(T,[122,147],'dim') + ln(T,[100,165],'dim') + dot(122,147) + dot(100,165) +
+      tx(132,104,'h') + tx(96,118,'l');
+  }
+};
+
+// ---------- Content ----------
+const SHAPES = [
+ { id:'cube', name:'Cube', vars:'<span class="m">a</span> = length of each side', draw:'cube',
+   tabs:[
+    {k:'lsa', short:'LSA', full:'Lateral Surface Area', lhs:'LSA', eq:'4a<sup>2</sup>',
+     explain:'A cube has 6 square faces, and each face has area <span class="m">a</span> × <span class="m">a</span> = <span class="m">a</span>². "Lateral" means only the 4 side walls, leaving out the top and the bottom. So LSA = 4 × <span class="m">a</span>².',
+     ex:{given:'Side a = 5 cm', steps:['LSA = 4a²','= 4 × 5 × 5','= 4 × 25'], ans:'LSA = 100 cm²'}},
+    {k:'tsa', short:'TSA', full:'Total Surface Area', lhs:'TSA', eq:'6a<sup>2</sup>',
+     explain:'Total means every face: 4 side walls plus the top and the bottom. That is 6 equal squares, so TSA = 6 × <span class="m">a</span>².',
+     ex:{given:'Side a = 5 cm', steps:['TSA = 6a²','= 6 × 25'], ans:'TSA = 150 cm²'}},
+    {k:'vol', short:'Volume', full:'Volume', lhs:'V', eq:'a<sup>3</sup>',
+     explain:'Volume is the space inside. For any box it is length × breadth × height. In a cube all three are <span class="m">a</span>, so V = <span class="m">a</span> × <span class="m">a</span> × <span class="m">a</span> = <span class="m">a</span>³.',
+     ex:{given:'Side a = 5 cm', steps:['V = a³','= 5 × 5 × 5'], ans:'V = 125 cm³'}}],
+   note:'<b>Diagonal of a cube</b> = √3 <span class="m">a</span>'},
+ { id:'cuboid', name:'Cuboid', vars:'<span class="m">l</span> = length, <span class="m">b</span> = breadth, <span class="m">h</span> = height', draw:'cuboid',
+   tabs:[
+    {k:'lsa', short:'LSA', full:'Lateral Surface Area', lhs:'LSA', eq:'2h(l + b)',
+     explain:'The 4 side walls are two rectangles of <span class="m">l</span> × <span class="m">h</span> and two of <span class="m">b</span> × <span class="m">h</span>. Adding them: 2<span class="m">lh</span> + 2<span class="m">bh</span> = 2<span class="m">h</span>(<span class="m">l</span> + <span class="m">b</span>). Think of it as the perimeter of the base × height (like painting the 4 walls of a room).',
+     ex:{given:'l = 10 cm, b = 6 cm, h = 4 cm', steps:['LSA = 2h(l + b)','= 2 × 4 × (10 + 6)','= 8 × 16'], ans:'LSA = 128 cm²'}},
+    {k:'tsa', short:'TSA', full:'Total Surface Area', lhs:'TSA', eq:'2(lb + bh + hl)',
+     explain:'A cuboid has 3 pairs of matching faces: top and bottom (<span class="m">l</span> × <span class="m">b</span>), front and back (<span class="m">l</span> × <span class="m">h</span>), left and right (<span class="m">b</span> × <span class="m">h</span>). Add one of each pair and double it.',
+     ex:{given:'l = 10 cm, b = 6 cm, h = 4 cm', steps:['TSA = 2(lb + bh + hl)','= 2(60 + 24 + 40)','= 2 × 124'], ans:'TSA = 248 cm²'}},
+    {k:'vol', short:'Volume', full:'Volume', lhs:'V', eq:'l × b × h',
+     explain:'Base area (<span class="m">l</span> × <span class="m">b</span>) tells you how many unit cubes fit in one layer. Multiply by the height to count all the layers.',
+     ex:{given:'l = 10 cm, b = 6 cm, h = 4 cm', steps:['V = l × b × h','= 10 × 6 × 4'], ans:'V = 240 cm³'}}],
+   note:'<b>Diagonal of a cuboid</b> = √(<span class="m">l</span>² + <span class="m">b</span>² + <span class="m">h</span>²)'},
+ { id:'cylinder', name:'Cylinder', vars:'<span class="m">r</span> = radius of base, <span class="m">h</span> = height', draw:'cylinder',
+   tabs:[
+    {k:'lsa', short:'CSA', full:'Curved Surface Area', lhs:'CSA', eq:'2πrh',
+     explain:'Peel the label off a can and open it flat: it becomes a rectangle. Its length is the circumference of the base, 2π<span class="m">r</span>, and its width is the height <span class="m">h</span>. Area = 2π<span class="m">r</span> × <span class="m">h</span>.',
+     ex:{given:'r = 7 cm, h = 10 cm (π = 22/7)', steps:['CSA = 2πrh','= 2 × 22/7 × 7 × 10','= 44 × 10'], ans:'CSA = 440 cm²'}},
+    {k:'tsa', short:'TSA', full:'Total Surface Area', lhs:'TSA', eq:'2πr(r + h)',
+     explain:'Add the two circular ends (top and bottom) to the curved surface: 2π<span class="m">rh</span> + 2π<span class="m">r</span>². Taking 2π<span class="m">r</span> common gives 2π<span class="m">r</span>(<span class="m">r</span> + <span class="m">h</span>).',
+     ex:{given:'r = 7 cm, h = 10 cm', steps:['TSA = 2πr(r + h)','= 2 × 22/7 × 7 × (7 + 10)','= 44 × 17'], ans:'TSA = 748 cm²'}},
+    {k:'vol', short:'Volume', full:'Volume', lhs:'V', eq:'πr<sup>2</sup>h',
+     explain:'Same idea as a box: base area × height. The base is a circle of area π<span class="m">r</span>², so V = π<span class="m">r</span>² × <span class="m">h</span>.',
+     ex:{given:'r = 7 cm, h = 10 cm', steps:['V = πr²h','= 22/7 × 7 × 7 × 10','= 154 × 10'], ans:'V = 1540 cm³'}}]},
+ { id:'hollow-cylinder', name:'Hollow Cylinder', vars:'<span class="m">R</span> = outer radius, <span class="m">r</span> = inner radius, <span class="m">h</span> = height', draw:'hollow',
+   tabs:[
+    {k:'lsa', short:'CSA', full:'Curved Surface Area', lhs:'CSA', eq:'2π(R + r)h',
+     explain:'A pipe has two curved surfaces: the outside (2π<span class="m">Rh</span>) and the inside (2π<span class="m">rh</span>). Add them: 2π(<span class="m">R</span> + <span class="m">r</span>)<span class="m">h</span>.',
+     ex:{given:'R = 7 cm, r = 3.5 cm, h = 10 cm', steps:['CSA = 2π(R + r)h','= 2 × 22/7 × 10.5 × 10'], ans:'CSA = 660 cm²'}},
+    {k:'tsa', short:'TSA', full:'Total Surface Area', lhs:'TSA', eq:'2π(R + r)h + 2π(R<sup>2</sup> − r<sup>2</sup>)',
+     explain:'Both curved surfaces, plus the two flat rings at the top and bottom. Each ring is the big circle minus the hole: π(<span class="m">R</span>² − <span class="m">r</span>²).',
+     ex:{given:'R = 7 cm, r = 3.5 cm, h = 10 cm', steps:['Curved = 660 cm²','Rings = 2 × 22/7 × (49 − 12.25) = 231 cm²','TSA = 660 + 231'], ans:'TSA = 891 cm²'}},
+    {k:'vol', short:'Volume', full:'Volume of material', lhs:'V', eq:'πh(R<sup>2</sup> − r<sup>2</sup>)',
+     explain:'Volume of the full outer cylinder minus the volume of the hole: π<span class="m">R</span>²<span class="m">h</span> − π<span class="m">r</span>²<span class="m">h</span>.',
+     ex:{given:'R = 7 cm, r = 3.5 cm, h = 10 cm', steps:['V = πh(R² − r²)','= 22/7 × 10 × 36.75'], ans:'V = 1155 cm³'}}]},
+ { id:'cone', name:'Cone', vars:'<span class="m">r</span> = radius, <span class="m">h</span> = height, <span class="m">l</span> = slant height', draw:'cone',
+   tabs:[
+    {k:'lsa', short:'CSA', full:'Curved Surface Area', lhs:'CSA', eq:'πrl',
+     explain:'Cut a cone open along its side and it flattens into a sector of a circle with radius <span class="m">l</span>. Its area works out to π<span class="m">rl</span>. Note it uses the slant height <span class="m">l</span>, not the height <span class="m">h</span>.',
+     ex:{given:'r = 7 cm, h = 24 cm', steps:['l = √(7² + 24²) = √625 = 25 cm','CSA = πrl = 22/7 × 7 × 25'], ans:'CSA = 550 cm²'}},
+    {k:'tsa', short:'TSA', full:'Total Surface Area', lhs:'TSA', eq:'πr(l + r)',
+     explain:'Curved surface plus the circular base: π<span class="m">rl</span> + π<span class="m">r</span>² = π<span class="m">r</span>(<span class="m">l</span> + <span class="m">r</span>).',
+     ex:{given:'r = 7 cm, l = 25 cm', steps:['TSA = πr(l + r)','= 22/7 × 7 × 32','= 22 × 32'], ans:'TSA = 704 cm²'}},
+    {k:'vol', short:'Volume', full:'Volume', lhs:'V', eq:'⅓ πr<sup>2</sup>h',
+     explain:'A cone holds exactly one-third of a cylinder with the same base and height. Fill a cone with water 3 times and you fill the cylinder. Use the height <span class="m">h</span> here, not <span class="m">l</span>.',
+     ex:{given:'r = 7 cm, h = 24 cm', steps:['V = ⅓ × 22/7 × 7 × 7 × 24','= ⅓ × 154 × 24'], ans:'V = 1232 cm³'}}],
+   note:'<b>Slant height</b> <span class="m">l</span> = √(<span class="m">r</span>² + <span class="m">h</span>²), from Pythagoras'},
+ { id:'sphere', name:'Sphere', vars:'<span class="m">r</span> = radius', draw:'sphere',
+   tabs:[
+    {k:'tsa', short:'Surface', full:'Surface Area', lhs:'SA', eq:'4πr<sup>2</sup>',
+     explain:'A sphere has one curved surface, so CSA = TSA. Its area equals exactly 4 circles of the same radius (4 × π<span class="m">r</span>²).',
+     ex:{given:'r = 7 cm', steps:['SA = 4πr²','= 4 × 22/7 × 49','= 4 × 154'], ans:'SA = 616 cm²'}},
+    {k:'vol', short:'Volume', full:'Volume', lhs:'V', eq:'⁴⁄₃ πr<sup>3</sup>',
+     explain:'The volume grows with the cube of the radius. Double the radius and the volume becomes 8 times bigger.',
+     ex:{given:'r = 7 cm', steps:['V = 4/3 × 22/7 × 343','= 4/3 × 1078'], ans:'V ≈ 1437.33 cm³'}}]},
+ { id:'hemisphere', name:'Hemisphere', vars:'<span class="m">r</span> = radius', draw:'hemi',
+   tabs:[
+    {k:'lsa', short:'CSA', full:'Curved Surface Area', lhs:'CSA', eq:'2πr<sup>2</sup>',
+     explain:'Half of a sphere, so half of 4π<span class="m">r</span>²: the dome alone is 2π<span class="m">r</span>².',
+     ex:{given:'r = 7 cm', steps:['CSA = 2πr²','= 2 × 154'], ans:'CSA = 308 cm²'}},
+    {k:'tsa', short:'TSA', full:'Total Surface Area', lhs:'TSA', eq:'3πr<sup>2</sup>',
+     explain:'The dome (2π<span class="m">r</span>²) plus the flat circular base (π<span class="m">r</span>²) gives 3π<span class="m">r</span>².',
+     ex:{given:'r = 7 cm', steps:['TSA = 3πr²','= 3 × 154'], ans:'TSA = 462 cm²'}},
+    {k:'vol', short:'Volume', full:'Volume', lhs:'V', eq:'⅔ πr<sup>3</sup>',
+     explain:'Half of the sphere\'s volume: ½ × ⁴⁄₃π<span class="m">r</span>³ = ⅔π<span class="m">r</span>³.',
+     ex:{given:'r = 7 cm', steps:['V = 2/3 × 22/7 × 343','= 2/3 × 1078'], ans:'V ≈ 718.67 cm³'}}]},
+ { id:'spherical-shell', name:'Spherical Shell', vars:'<span class="m">R</span> = outer radius, <span class="m">r</span> = inner radius', draw:'shell',
+   tabs:[
+    {k:'tsa', short:'Surface', full:'Outer and Inner Surface', lhs:'SA', eq:'4πR<sup>2</sup> , 4πr<sup>2</sup>',
+     explain:'A hollow ball (cut open in the picture) has an outer surface 4π<span class="m">R</span>² and an inner surface 4π<span class="m">r</span>². Questions usually ask for the outer one.',
+     ex:{given:'R = 7 cm, r = 3.5 cm', steps:['Outer = 4 × 22/7 × 49 = 616 cm²','Inner = 4 × 22/7 × 12.25 = 154 cm²'], ans:'Outer 616 cm², inner 154 cm²'}},
+    {k:'vol', short:'Volume', full:'Volume of material', lhs:'V', eq:'⁴⁄₃ π(R<sup>3</sup> − r<sup>3</sup>)',
+     explain:'The big sphere minus the hollow sphere inside: ⁴⁄₃π<span class="m">R</span>³ − ⁴⁄₃π<span class="m">r</span>³.',
+     ex:{given:'R = 7 cm, r = 3.5 cm', steps:['R³ − r³ = 343 − 42.875 = 300.125','V = 4/3 × 22/7 × 300.125'], ans:'V ≈ 1257.67 cm³'}}]},
+ { id:'frustum', name:'Frustum of a Cone', vars:'<span class="m">R</span>, <span class="m">r</span> = radii of the ends, <span class="m">h</span> = height, <span class="m">l</span> = slant height', draw:'frustum',
+   tabs:[
+    {k:'lsa', short:'CSA', full:'Curved Surface Area', lhs:'CSA', eq:'π(R + r)l',
+     explain:'A frustum is a cone with its top sliced off, like a bucket or a glass. Its curved surface is π(<span class="m">R</span> + <span class="m">r</span>)<span class="m">l</span>.',
+     ex:{given:'R = 10 cm, r = 4 cm, h = 8 cm', steps:['l = √(8² + 6²) = 10 cm','CSA = 22/7 × 14 × 10'], ans:'CSA = 440 cm²'}},
+    {k:'tsa', short:'TSA', full:'Total Surface Area', lhs:'TSA', eq:'π(R + r)l + πR<sup>2</sup> + πr<sup>2</sup>',
+     explain:'Curved surface plus both circular ends. For an open bucket, leave out the top circle πR².',
+     ex:{given:'R = 10 cm, r = 4 cm, l = 10 cm', steps:['Curved = 440 cm²','Ends = 22/7 × (100 + 16) ≈ 364.57 cm²'], ans:'TSA ≈ 804.57 cm²'}},
+    {k:'vol', short:'Volume', full:'Volume', lhs:'V', eq:'⅓ πh(R<sup>2</sup> + r<sup>2</sup> + Rr)',
+     explain:'It is the big cone minus the small cone that was cut off. Simplifying that gives this formula.',
+     ex:{given:'R = 10 cm, r = 4 cm, h = 8 cm', steps:['R² + r² + Rr = 100 + 16 + 40 = 156','V = ⅓ × 22/7 × 8 × 156'], ans:'V ≈ 1307.43 cm³'}}],
+   note:'<b>Slant height</b> <span class="m">l</span> = √(<span class="m">h</span>² + (<span class="m">R</span> − <span class="m">r</span>)²)'},
+ { id:'prism', name:'Prism', vars:'<span class="m">h</span> = length (height) of the prism', draw:'prism',
+   tabs:[
+    {k:'lsa', short:'LSA', full:'Lateral Surface Area', lhs:'LSA', eq:'perimeter of base × h',
+     explain:'The side faces are rectangles, one for each edge of the base. Laid side by side they form one long rectangle: base perimeter × height.',
+     ex:{given:'Triangle base with sides 3, 4, 5 cm; h = 10 cm', steps:['Perimeter = 3 + 4 + 5 = 12 cm','LSA = 12 × 10'], ans:'LSA = 120 cm²'}},
+    {k:'tsa', short:'TSA', full:'Total Surface Area', lhs:'TSA', eq:'LSA + 2 × base area',
+     explain:'Add the two matching ends (front and back) to the side faces.',
+     ex:{given:'Same prism; base area = ½ × 3 × 4 = 6 cm²', steps:['TSA = 120 + 2 × 6'], ans:'TSA = 132 cm²'}},
+    {k:'vol', short:'Volume', full:'Volume', lhs:'V', eq:'base area × h',
+     explain:'Every prism (cube, cuboid and cylinder too) follows this rule: area of the end shape × length.',
+     ex:{given:'Base area = 6 cm², h = 10 cm', steps:['V = 6 × 10'], ans:'V = 60 cm³'}}]},
+ { id:'pyramid', name:'Pyramid', vars:'<span class="m">h</span> = height, <span class="m">l</span> = slant height', draw:'pyramid',
+   tabs:[
+    {k:'lsa', short:'LSA', full:'Lateral Surface Area', lhs:'LSA', eq:'½ × perimeter × l',
+     explain:'Each side face is a triangle with base = one edge and height = slant height <span class="m">l</span>. Adding all the triangles gives ½ × base perimeter × <span class="m">l</span>.',
+     ex:{given:'Square base 10 cm, h = 12 cm', steps:['l = √(12² + 5²) = 13 cm','LSA = ½ × 40 × 13'], ans:'LSA = 260 cm²'}},
+    {k:'tsa', short:'TSA', full:'Total Surface Area', lhs:'TSA', eq:'LSA + base area',
+     explain:'Side triangles plus the one base at the bottom.',
+     ex:{given:'LSA = 260 cm², base = 10 × 10', steps:['TSA = 260 + 100'], ans:'TSA = 360 cm²'}},
+    {k:'vol', short:'Volume', full:'Volume', lhs:'V', eq:'⅓ × base area × h',
+     explain:'Like the cone, a pyramid holds one-third of the prism with the same base and height.',
+     ex:{given:'Base = 100 cm², h = 12 cm', steps:['V = ⅓ × 100 × 12'], ans:'V = 400 cm³'}}]}
+];
+
+// ---------- Views ----------
+const app = document.getElementById('app');
+const state = {};
+const tabOf = s => state[s.id] && s.tabs.find(t => t.k === state[s.id]) ? state[s.id] : s.tabs[0].k;
+
+function home(open) {
+  const cards = SHAPES.map((s, i) => `
+    <button class="card" data-go="${s.id}" aria-label="${s.name}">
+      <span class="num">Formula ${i + 1}</span>
+      ${wrap(DRAW[s.draw](null), s.name)}
+      <h3>${s.name}</h3>
+      <span class="chips">${s.tabs.map(t => `<span class="chip">${t.short}</span>`).join('')}</span>
+    </button>`).join('');
+  app.innerHTML = `
+    <header class="chapter">
+      <h1>Maths</h1>
+      <p>Tap a chapter to open it.</p>
+    </header>
+    <button class="chbar" data-go="${open ? '' : 'ch14'}" aria-expanded="${open}" id="ch14">
+      <span class="chno"><small>Ch</small><b>14</b></span>
+      <span class="chname">Surface Area and Volume</span>
+      <span class="chmeta">${SHAPES.length} shapes <i>CSA · TSA · Volume</i></span>
+      <span class="chev" aria-hidden="true">▼</span>
+    </button>
+    ${open ? `<p class="hint">Tap a shape to see its formulas with a diagram and explanation.</p>
+    <div class="grid">${cards}
+      <button class="card rev" data-go="revision" aria-label="Quick revision">
+        <span class="num">All shapes</span>
+        <span class="rev-mark">πr²h<br>⅓πr²h<br>4πr²</span>
+        <h3>Quick Revision</h3>
+        <p>Every formula on one page</p>
+      </button>
+    </div>` : ''}`;
+}
+
+function detail(s) {
+  const k = tabOf(s), t = s.tabs.find(x => x.k === k), idx = SHAPES.indexOf(s);
+  const prev = SHAPES[idx - 1], next = SHAPES[idx + 1];
+  const legend = k === 'vol'
+    ? `<span><i class="sw vol"></i>Space inside the shape</span>`
+    : `<span><i class="sw on"></i>Surfaces included</span>${s.id === 'sphere' || s.id === 'spherical-shell' ? '' : '<span><i class="sw off"></i>Not included</span>'}`;
+  app.innerHTML = `
+    <button class="back" data-go="ch14">← Ch–14 shapes</button>
+    <header class="dhead">
+      <span class="eyebrow">Formula ${idx + 1} of ${SHAPES.length}</span>
+      <h2>${s.name}</h2>
+      <div class="vars">${s.vars}</div>
+    </header>
+    <div class="tabs" role="tablist">
+      ${s.tabs.map(x => `<button class="tab" role="tab" id="tab-${s.id}-${x.k}" aria-selected="${x.k === k}" data-tab="${x.k}">${x.short}<small>${x.full}</small></button>`).join('')}
+    </div>
+    <section class="panel" role="tabpanel" aria-labelledby="tab-${s.id}-${k}">
+      <div class="fig">
+        ${wrap(DRAW[s.draw](k), s.name + ' – ' + t.full)}
+        <div class="legend">${legend}<span>Dashed lines = hidden edges</span></div>
+      </div>
+      <div class="formula">
+        <div class="name">${t.full}</div>
+        <div class="eq"><span class="lhs">${t.lhs} =</span> ${t.eq}</div>
+      </div>
+      <div class="section">
+        <h3>How it works</h3>
+        <p>${t.explain}</p>
+      </div>
+      <div class="example">
+        <h3>Example</h3>
+        <p style="margin:0 0 4px"><b>Given:</b> ${t.ex.given}</p>
+        <ol>${t.ex.steps.map(x => `<li>${x}</li>`).join('')}</ol>
+        <div class="ans">${t.ex.ans}</div>
+      </div>
+      ${s.note ? `<div class="note">${s.note}</div>` : ''}
+    </section>
+    <nav class="pager">
+      ${prev ? `<button data-go="${prev.id}">← ${prev.name}</button>` : '<span class="sp"></span>'}
+      ${next ? `<button data-go="${next.id}">${next.name} →</button>` : `<button data-go="revision">Quick Revision →</button>`}
+    </nav>`;
+  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { state[s.id] = b.dataset.tab; detail(s); document.getElementById(`tab-${s.id}-${b.dataset.tab}`).focus(); });
+}
+
+function revision() {
+  const cell = (s, ks) => { const t = s.tabs.find(x => ks.includes(x.k)); return t ? t.eq : '—'; };
+  app.innerHTML = `
+    <button class="back" data-go="ch14">← Ch–14 shapes</button>
+    <header class="dhead">
+      <span class="eyebrow">Surface Area and Volume</span>
+      <h2>Quick Revision</h2>
+      <div class="vars">Tap a shape name to open its diagrams. Use π = 22/7 or 3.14.</div>
+    </header>
+    <div class="tbl"><table>
+      <thead><tr><th>Shape</th><th>CSA / LSA</th><th>TSA</th><th>Volume</th></tr></thead>
+      <tbody>${SHAPES.map(s => `<tr>
+        <td><button data-go="${s.id}">${s.name}</button></td>
+        <td class="f">${s.id === 'sphere' ? '4πr<sup>2</sup>' : s.id === 'spherical-shell' ? '4πR<sup>2</sup> (outer)' : cell(s, ['lsa'])}</td>
+        <td class="f">${s.id === 'spherical-shell' ? '—' : cell(s, ['tsa'])}</td>
+        <td class="f">${cell(s, ['vol'])}</td></tr>`).join('')}</tbody>
+    </table></div>
+    <div class="note" style="margin-top:16px"><b>Units:</b> area in cm² or m², volume in cm³ or m³. 1 m³ = 1000 litres, 1 litre = 1000 cm³.</div>`;
+}
+
+function route() {
+  const id = decodeURIComponent(location.hash.slice(1));
+  const s = SHAPES.find(x => x.id === id);
+  if (s) detail(s); else if (id === 'revision') revision(); else home(id === 'ch14');
+  window.scrollTo(0, 0);
+}
+app.addEventListener('click', e => {
+  const b = e.target.closest('[data-go]');
+  if (!b) return;
+  const id = b.dataset.go;
+  if (('#' + id) === location.hash || (!id && !location.hash)) route();
+  else location.hash = id;
+});
+window.addEventListener('hashchange', route);
+route();
+</script>
+</body>
+</html>
