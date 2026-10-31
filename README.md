@@ -5,7 +5,7 @@ A simple maths formula app for school students.
 ## Chapters
 
 - **Ch 8 Quadrilaterals**: Angle Sum, Parallelogram, Rectangle, Rhombus, Square, Trapezium, Mid-point Theorem, Mid-points of a Quadrilateral
-- **Ch 8 Sequences and Series (Class 11)**: AP, GP, AM and GM, special series
+- **Ch 8 Sequences and Series**: AP, GP, AM and GM, special series
 - **Ch‑14 Surface Area and Volume**: Cube, Cuboid, Cylinder, Hollow Cylinder, Cone, Sphere, Hemisphere, Spherical Shell
 
 Tap a chapter to open it, then tap a shape to see its CSA/LSA, TSA and Volume formulas. Each formula comes with a diagram that highlights the surfaces counted, a short explanation and a worked example. A Quick Revision page lists every formula in one table.
