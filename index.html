@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Maths formulas app: Ch-14 Surface Area and Volume with diagrams, explanations and examples.">
+<meta name="description" content="Class 9 maths formulas with diagrams: Ch 8 Quadrilaterals and Ch 14 Surface Area and Volume.">
 <title>Maths</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#11142a">
@@ -103,6 +103,29 @@ h1,h2,h3{font-family:var(--font-display);line-height:1.1;margin:0;text-wrap:bala
 .hint b{color:var(--ink);font-weight:600}
 .card.rev{grid-column:1/-1}
 @media (min-width:620px) and (max-width:799px){.card.rev{grid-column:auto}}
+/* Ch 8 geometry marks */
+.hs{stroke:var(--hl);stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.hs2{stroke:var(--vol);stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.tk{stroke:var(--accent-2);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.diag{stroke:var(--ink);stroke-width:1.2;stroke-dasharray:5 4;stroke-opacity:.6;fill:none}
+.wg{fill:var(--hl);fill-opacity:.85;stroke:none}
+.wg2{fill:var(--vol);fill-opacity:.85;stroke:none}
+.ra{fill:none;stroke:var(--ink);stroke-width:1.3;stroke-opacity:.8}
+.ra.on{fill:var(--hl);fill-opacity:.85;stroke:none}
+.tint{fill:var(--hl);fill-opacity:.2;stroke:none}
+.tint2{fill:var(--vol);fill-opacity:.25;stroke:none}
+.vx{fill:var(--ink);font-family:var(--font-body);font-weight:600;font-size:13px;text-anchor:middle}
+.card .vx{font-size:13px}
+.formula .eq.long{font-size:clamp(1.25rem,5.4vw,1.75rem);line-height:1.35;overflow-wrap:anywhere}
+.explain{margin:0 0 6px}
+.explain ol,.explain ul{margin:8px 0 0;padding-left:1.25em;display:flex;flex-direction:column;gap:4px}
+.grid{margin-bottom:18px}
+table.rev8{min-width:0}
+table.rev8 td:first-child{width:34%}
+table.rev8 td:first-child button{white-space:normal}
+.rrow{padding:2px 0}
+.rrow .f{font-family:var(--font-math);font-style:italic;font-size:1.02rem}
+.rrow small{color:var(--muted);font-size:.72rem;white-space:nowrap}
 @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
 /* Detail */
@@ -364,73 +387,310 @@ const SHAPES = [
      ex:{given:'R = 7 cm, r = 3.5 cm', steps:['R³ − r³ = 343 − 42.875 = 300.125','V = 4/3 × 22/7 × 300.125'], ans:'V ≈ 1257.67 cm³'}}]},
 ];
 
+// ---------- Ch 8 Quadrilaterals: geometry helpers ----------
+const V = {
+  add: (a, b) => [a[0] + b[0], a[1] + b[1]], sub: (a, b) => [a[0] - b[0], a[1] - b[1]],
+  mul: (a, k) => [a[0] * k, a[1] * k], lerp: (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t],
+  mid: (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2],
+  unit: v => { const l = Math.hypot(v[0], v[1]) || 1; return [v[0] / l, v[1] / l]; },
+  perp: v => [-v[1], v[0]]
+};
+const r1 = n => Math.round(n * 10) / 10;
+const pt = p => p.map(r1);
+function ticks(a, b, n, cls = 'tk', at = .5) {
+  const m = V.lerp(a, b, at), u = V.unit(V.sub(b, a)), p = V.perp(u); let o = '';
+  for (let i = 0; i < n; i++) { const c = V.add(m, V.mul(u, (i - (n - 1) / 2) * 5)); o += ln(pt(V.add(c, V.mul(p, 6))), pt(V.add(c, V.mul(p, -6))), cls); }
+  return o;
+}
+function chev(a, b, n = 1, cls = 'tk', at = .5) {
+  const m = V.lerp(a, b, at), u = V.unit(V.sub(b, a)), p = V.perp(u); let o = '';
+  for (let i = 0; i < n; i++) {
+    const c = V.add(m, V.mul(u, (i - (n - 1) / 2) * 6)), tip = V.add(c, V.mul(u, 3)), back = V.add(c, V.mul(u, -3));
+    o += `<polyline points="${P([V.add(back, V.mul(p, 4.5)), tip, V.add(back, V.mul(p, -4.5))].map(pt))}" class="${cls}"/>`;
+  }
+  return o;
+}
+function wedge(O, P1, P2, r, cls) {
+  const u1 = V.unit(V.sub(P1, O)), u2 = V.unit(V.sub(P2, O)), a = V.add(O, V.mul(u1, r)), b = V.add(O, V.mul(u2, r));
+  const cr = u1[0] * u2[1] - u1[1] * u2[0];
+  return `<path d="M${pt(O)} L${pt(a)} A${r},${r} 0 0 ${cr > 0 ? 1 : 0} ${pt(b)} Z" class="${cls}"/>`;
+}
+function rightA(O, P1, P2, s = 11, cls = 'ra') {
+  const u1 = V.unit(V.sub(P1, O)), u2 = V.unit(V.sub(P2, O)), a = V.add(O, V.mul(u1, s)), c = V.add(O, V.mul(u2, s));
+  return `<polygon points="${P([O, a, V.add(a, V.mul(u2, s)), c].map(pt))}" class="${cls}"/>`;
+}
+const corners = (Q, cls) => Q.map((p, i) => rightA(p, Q[(i + 1) % 4], Q[(i + 3) % 4], 11, cls)).join('');
+const sides = Q => Q.map((p, i) => [p, Q[(i + 1) % 4]]);
+const vlabel = (p, off, t) => `<text x="${r1(p[0] + off[0])}" y="${r1(p[1] + off[1] + 5)}" class="vx">${t}</text>`;
+function names(Q, ns) {
+  const G = Q.reduce((s, p) => V.add(s, V.mul(p, 1 / Q.length)), [0, 0]);
+  return Q.map((p, i) => vlabel(p, V.mul(V.unit(V.sub(p, G)), 13), ns[i])).join('');
+}
+const qdot = p => `<circle cx="${r1(p[0])}" cy="${r1(p[1])}" r="2.8" class="dot"/>`;
+const dotO = (O, off = [14, 2]) => qdot(O) + vlabel(O, off, 'O');
+const ABCD = ['A', 'B', 'C', 'D'];
+
+const QDRAW = {
+  anglesum: k => {
+    const A = [38, 165], B = [190, 152], C = [208, 58], D = [72, 38], Q = [A, B, C, D];
+    let o = pg(Q, 'f-off');
+    if (k) o += pg([A, B, C], 'tint') + pg([A, C, D], 'tint2') + ln(A, C, 'diag') +
+      wedge(A, B, D, 20, 'wg') + wedge(B, C, A, 20, 'wg') + wedge(C, D, B, 18, 'wg') + wedge(D, A, C, 18, 'wg');
+    return o + pg(Q, 'st') + names(Q, ABCD);
+  },
+  parallelogram: k => {
+    const A = [32, 160], B = [160, 160], C = [208, 50], D = [80, 50], Q = [A, B, C, D], O = V.mid(A, C);
+    let o = pg(Q, 'f-off');
+    if (k === 'sides') o += ln(A, B, 'hs') + ln(D, C, 'hs') + ln(A, D, 'hs2') + ln(B, C, 'hs2') + ticks(A, B, 1) + ticks(D, C, 1) + ticks(A, D, 2) + ticks(B, C, 2);
+    if (k === 'angles') o += wedge(A, B, D, 22, 'wg') + wedge(C, D, B, 22, 'wg') + wedge(B, C, A, 18, 'wg2') + wedge(D, A, C, 18, 'wg2');
+    if (k === 'diag') o += ln(A, C, 'hs') + ln(B, D, 'hs2') + ticks(A, O, 1) + ticks(O, C, 1) + ticks(B, O, 2) + ticks(O, D, 2) + dotO(O);
+    if (k === 'prove') o += ln(A, B, 'hs') + ln(D, C, 'hs') + ticks(A, B, 1, 'tk', .35) + ticks(D, C, 1, 'tk', .35) + chev(A, B, 1, 'tk', .62) + chev(D, C, 1, 'tk', .62);
+    if (!k) o += chev(A, B, 1) + chev(D, C, 1) + chev(A, D, 2) + chev(B, C, 2);
+    return o + pg(Q, 'st') + names(Q, ABCD);
+  },
+  rectangle: k => {
+    const A = [40, 160], B = [200, 160], C = [200, 55], D = [40, 55], Q = [A, B, C, D], O = V.mid(A, C);
+    let o = pg(Q, 'f-off');
+    if (k === 'angles') o += corners(Q, 'ra on') + ticks(A, B, 1) + ticks(D, C, 1) + ticks(A, D, 2) + ticks(B, C, 2);
+    if (k === 'diag') o += ln(A, C, 'hs') + ln(B, D, 'hs') + ticks(A, O, 1) + ticks(O, C, 1) + ticks(B, O, 1) + ticks(O, D, 1) + dotO(O);
+    if (!k) o += corners(Q, 'ra');
+    return o + pg(Q, 'st') + names(Q, ABCD);
+  },
+  rhombus: k => {
+    const A = [120, 175], B = [205, 105], C = [120, 35], D = [35, 105], Q = [A, B, C, D], O = [120, 105];
+    let o = pg(Q, 'f-off');
+    if (k === 'sides') o += sides(Q).map(([a, b]) => ln(a, b, 'hs') + ticks(a, b, 1)).join('');
+    if (k === 'diag') o += ln(A, C, 'hs') + ln(B, D, 'hs2') + ticks(A, O, 1) + ticks(O, C, 1) + ticks(B, O, 2) + ticks(O, D, 2) + rightA(O, B, C, 11, 'ra on') + dotO(O, [13, 13]);
+    if (!k) o += sides(Q).map(([a, b]) => ticks(a, b, 1)).join('');
+    return o + pg(Q, 'st') + names(Q, ABCD);
+  },
+  square: k => {
+    const A = [58, 165], B = [182, 165], C = [182, 41], D = [58, 41], Q = [A, B, C, D], O = V.mid(A, C);
+    let o = pg(Q, 'f-off');
+    if (k === 'sides') o += sides(Q).map(([a, b]) => ln(a, b, 'hs') + ticks(a, b, 1)).join('') + corners(Q, 'ra on');
+    if (k === 'diag') o += wedge(A, B, C, 24, 'wg2') + ln(A, C, 'hs') + ln(B, D, 'hs') + ticks(A, O, 1) + ticks(O, C, 1) + ticks(B, O, 1) + ticks(O, D, 1) + rightA(O, B, C, 10, 'ra on') + dotO(O, [14, 13]) + vlabel(A, [34, -10], '45°');
+    if (!k) o += corners(Q, 'ra') + sides(Q).map(([a, b]) => ticks(a, b, 1)).join('');
+    return o + pg(Q, 'st') + names(Q, ABCD);
+  },
+  trapezium: k => {
+    const A = [28, 160], B = [212, 160], C = [160, 58], D = [80, 58], Q = [A, B, C, D];
+    let o = pg(Q, 'f-off');
+    if (k === 'parallel') o += ln(A, B, 'hs2') + ln(D, C, 'hs2') + chev(A, B) + chev(D, C) + wedge(A, B, D, 24, 'wg') + wedge(D, A, C, 18, 'wg');
+    if (k === 'iso') o += ln(A, D, 'hs2') + ln(B, C, 'hs2') + ticks(A, D, 1) + ticks(B, C, 1) + chev(A, B) + chev(D, C) +
+      wedge(A, B, D, 24, 'wg') + wedge(B, C, A, 24, 'wg') + wedge(C, D, B, 17, 'wg2') + wedge(D, A, C, 17, 'wg2');
+    if (!k) o += chev(A, B) + chev(D, C);
+    return o + pg(Q, 'st') + names(Q, ABCD);
+  },
+  midpoint: k => {
+    const A = [120, 30], B = [28, 172], C = [212, 172], E = V.mid(A, B), F = V.mid(A, C), T = [A, B, C];
+    let o = pg(T, 'f-off');
+    if (k === 'thm') o += pg([A, E, F], 'tint') + ln(E, F, 'hs') + ln(B, C, 'hs2') + chev(E, F, 1, 'tk', .72) + chev(B, C, 1, 'tk', .72) +
+      ticks(A, E, 1) + ticks(E, B, 1) + ticks(A, F, 2) + ticks(F, C, 2);
+    if (k === 'conv') o += ln(E, F, 'hs') + chev(E, F, 1, 'tk', .72) + chev(B, C, 1, 'tk', .72) + ticks(A, E, 1) + ticks(E, B, 1) +
+      ln(A, F, 'hs2') + ln(F, C, 'hs2') + ticks(A, F, 2) + ticks(F, C, 2);
+    if (!k) o += ln(E, F, 'st') + ticks(A, E, 1) + ticks(E, B, 1) + ticks(A, F, 2) + ticks(F, C, 2);
+    o += pg(T, 'st') + qdot(E) + qdot(F);
+    return o + vlabel(A, [0, -13], 'A') + vlabel(B, [-9, 9], 'B') + vlabel(C, [9, 9], 'C') + vlabel(E, [-13, -2], 'E') + vlabel(F, [13, -2], 'F');
+  },
+  midquad: k => {
+    if (k === 'special') {
+      const A = [36, 165], B = [204, 165], C = [204, 45], D = [36, 45], Q = [A, B, C, D];
+      const M = [V.mid(A, B), V.mid(B, C), V.mid(C, D), V.mid(D, A)];
+      return pg(Q, 'f-off') + corners(Q, 'ra') + pg(M, 'tint2') + pg(M, 'hs2') + M.map((p, i) => ticks(p, M[(i + 1) % 4], 1)).join('') +
+        pg(Q, 'st') + M.map(qdot).join('') + names(Q, ABCD);
+    }
+    const A = [34, 168], B = [196, 172], C = [214, 52], D = [64, 32], Q = [A, B, C, D];
+    const Pm = V.mid(A, B), Qm = V.mid(B, C), R = V.mid(C, D), S = V.mid(D, A), M = [Pm, Qm, R, S];
+    let o = pg(Q, 'f-off');
+    if (k === 'any') o += ln(A, C, 'diag') + pg(M, 'tint2') + ln(Pm, Qm, 'hs') + ln(S, R, 'hs') + ln(Qm, R, 'hs2') + ln(Pm, S, 'hs2') +
+      chev(Pm, Qm) + chev(S, R) + chev(A, C, 1, 'tk', .3);
+    else o += pg(M, 'st');
+    return o + pg(Q, 'st') + M.map(qdot).join('') + names(Q, ABCD) +
+      vlabel(Pm, [0, 14], 'P') + vlabel(Qm, [13, 2], 'Q') + vlabel(R, [0, -14], 'R') + vlabel(S, [-13, 0], 'S');
+  }
+};
+
+// ---------- Ch 8 Quadrilaterals: content ----------
+const QUADS = [
+ { id:'angle-sum', tag:'Basics', name:'Angle Sum', vars:'Any quadrilateral ABCD', draw:'anglesum',
+   tabs:[
+    {k:'sum', short:'360°', full:'Angle sum property', eq:'∠A + ∠B + ∠C + ∠D = 360°',
+     explain:'Draw the diagonal AC. It cuts the quadrilateral into two triangles, △ABC and △ACD. The angles of each triangle add up to 180°, so the four angles of the quadrilateral add up to 180° + 180° = 360°.',
+     ex:{given:'The angles are in the ratio 3 : 5 : 9 : 13', steps:['3x + 5x + 9x + 13x = 360°','30x = 360°, so x = 12°','Multiply each part by 12°'], ans:'36°, 60°, 108°, 156°'}}],
+   note:'This works for <b>every</b> quadrilateral, not just the special ones.'},
+ { id:'parallelogram', tag:'Class 9', name:'Parallelogram', vars:'AB ∥ DC and AD ∥ BC (both pairs of opposite sides parallel)', draw:'parallelogram',
+   tabs:[
+    {k:'sides', short:'Sides', full:'Opposite sides are equal', th:'Theorem 8.2', eq:'AB = CD,  AD = BC',
+     explain:'The diagonal AC splits the parallelogram into two congruent triangles, △ABC ≅ △CDA (Theorem 8.1, by ASA using alternate angles). Matching parts are equal, so AB = CD and AD = BC.<br><b>Converse (Theorem 8.3):</b> if both pairs of opposite sides of a quadrilateral are equal, it is a parallelogram.',
+     ex:{given:'Perimeter = 40 cm, AB = 12 cm', steps:['Perimeter = 2(AB + BC) = 40','AB + BC = 20','BC = 20 − 12 = 8 cm'], ans:'CD = 12 cm, BC = AD = 8 cm'}},
+    {k:'angles', short:'Angles', full:'Opposite angles are equal', th:'Theorem 8.4', eq:'∠A = ∠C,  ∠B = ∠D',
+     explain:'The same congruent triangles give ∠A = ∠C and ∠B = ∠D. Neighbouring angles sit between parallel lines (co-interior angles), so they add up to 180°: ∠A + ∠B = 180°.<br><b>Converse (Theorem 8.5):</b> if both pairs of opposite angles of a quadrilateral are equal, it is a parallelogram.',
+     ex:{given:'∠A = 70°', steps:['∠C = ∠A = 70° (opposite angles)','∠B = 180° − 70° = 110° (adjacent angles)','∠D = ∠B = 110°'], ans:'70°, 110°, 70°, 110°'}},
+    {k:'diag', short:'Diagonals', full:'Diagonals bisect each other', th:'Theorem 8.6', eq:'OA = OC,  OB = OD',
+     explain:'The diagonals cut each other exactly in half at O. They are usually <b>not</b> equal in length. Each diagonal also divides the parallelogram into two congruent triangles (Theorem 8.1).<br><b>Converse (Theorem 8.7):</b> if the diagonals of a quadrilateral bisect each other, it is a parallelogram.',
+     ex:{given:'OA = 5 cm, OB = 3.5 cm', steps:['AC = OA + OC = 5 + 5','BD = OB + OD = 3.5 + 3.5'], ans:'AC = 10 cm, BD = 7 cm'}},
+    {k:'prove', short:'Prove it', full:'Is it a parallelogram?', th:'Theorem 8.8', eq:'AB = CD  and  AB ∥ CD',
+     explain:'A quadrilateral is a parallelogram if <b>any one</b> of these is true:<ol><li>Both pairs of opposite sides are parallel (definition)</li><li>Both pairs of opposite sides are equal (Theorem 8.3)</li><li>Both pairs of opposite angles are equal (Theorem 8.5)</li><li>The diagonals bisect each other (Theorem 8.7)</li><li>One pair of opposite sides is equal <b>and</b> parallel (Theorem 8.8)</li></ol>',
+     ex:{given:'In ABCD, AB = CD = 7 cm and AB ∥ CD', steps:['One pair of opposite sides is equal','The same pair is also parallel','So Theorem 8.8 applies'], ans:'ABCD is a parallelogram'}}]},
+ { id:'rectangle', tag:'Class 9', name:'Rectangle', vars:'A parallelogram with one angle of 90°', draw:'rectangle',
+   tabs:[
+    {k:'angles', short:'Angles', full:'Every angle is 90°', eq:'∠A = ∠B = ∠C = ∠D = 90°',
+     explain:'A rectangle is a parallelogram with one right angle. Adjacent angles of a parallelogram add up to 180° and opposite angles are equal, so all four angles become 90°. It keeps every parallelogram property, such as opposite sides being equal.',
+     ex:{given:'Parallelogram ABCD with ∠A = 90°', steps:['∠B = 180° − 90° = 90°','∠C = ∠A = 90°,  ∠D = ∠B = 90°'], ans:'All angles are 90°, so ABCD is a rectangle'}},
+    {k:'diag', short:'Diagonals', full:'Diagonals are equal', eq:'AC = BD',
+     explain:'The diagonals of a rectangle are equal and bisect each other, so all four half-diagonals are equal: OA = OB = OC = OD. Reason: △ABC ≅ △BAD (SAS), so AC = BD.<br><b>Converse:</b> if the diagonals of a parallelogram are equal, it is a rectangle.',
+     ex:{given:'AC = 10 cm', steps:['BD = AC = 10 cm','O is the mid-point of both diagonals'], ans:'OA = OB = OC = OD = 5 cm'}}]},
+ { id:'rhombus', tag:'Class 9', name:'Rhombus', vars:'A parallelogram with all four sides equal', draw:'rhombus',
+   tabs:[
+    {k:'sides', short:'Sides', full:'All sides are equal', eq:'AB = BC = CD = DA',
+     explain:'A rhombus is a parallelogram whose four sides are all equal. So it also has every parallelogram property: opposite sides parallel, opposite angles equal, and diagonals bisecting each other.',
+     ex:{given:'Perimeter = 52 cm', steps:['4 × side = 52','side = 52 ÷ 4'], ans:'Each side = 13 cm'}},
+    {k:'diag', short:'Diagonals', full:'Diagonals meet at 90°', eq:'AC ⊥ BD',
+     explain:'The diagonals of a rhombus bisect each other <b>at right angles</b>. Reason: △AOB ≅ △COB (SSS), so ∠AOB = ∠COB. Together they make 180°, so each is 90°. The diagonals are usually not equal.<br><b>Converse:</b> if the diagonals of a quadrilateral bisect each other at right angles, it is a rhombus.',
+     ex:{given:'Diagonals AC = 16 cm, BD = 12 cm', steps:['OA = 8 cm, OB = 6 cm','∠AOB = 90°, so use Pythagoras','AB = √(8² + 6²) = √100'], ans:'Each side = 10 cm'}}]},
+ { id:'square', tag:'Class 9', name:'Square', vars:'A rectangle with all sides equal (also a rhombus)', draw:'square',
+   tabs:[
+    {k:'sides', short:'Sides', full:'Equal sides, 90° angles', eq:'AB = BC = CD = DA',
+     explain:'A square is both a rectangle and a rhombus, so it has every property of both: four equal sides, four right angles, and opposite sides parallel.',
+     ex:{given:'Side = 6 cm', steps:['Perimeter = 4 × 6','Diagonal = √(6² + 6²) = 6√2'], ans:'Perimeter 24 cm, diagonal ≈ 8.49 cm'}},
+    {k:'diag', short:'Diagonals', full:'Equal and at 90°', eq:'AC = BD,  AC ⊥ BD',
+     explain:'The diagonals of a square are equal (like a rectangle) and bisect each other at right angles (like a rhombus). Each diagonal also cuts the corner angles into two angles of 45°.<br><b>Converse:</b> if the diagonals of a quadrilateral are equal and bisect each other at right angles, it is a square.',
+     ex:{given:'AC = 8 cm', steps:['BD = AC = 8 cm','OA = OB = 4 cm','∠AOB = 90°,  ∠OAB = 45°'], ans:'BD = 8 cm, OA = OB = 4 cm'}}]},
+ { id:'trapezium', tag:'Tricky', name:'Trapezium', vars:'Only one pair of opposite sides parallel: AB ∥ DC', draw:'trapezium',
+   tabs:[
+    {k:'parallel', short:'Angles', full:'Co-interior angles', eq:'∠A + ∠D = 180°',
+     explain:'AD crosses the parallel sides AB and DC, so ∠A and ∠D are co-interior angles and add up to 180°. In the same way, ∠B + ∠C = 180°.',
+     ex:{given:'AB ∥ DC, ∠A = 65°, ∠B = 75°', steps:['∠D = 180° − 65°','∠C = 180° − 75°'], ans:'∠D = 115°, ∠C = 105°'}},
+    {k:'iso', short:'Isosceles', full:'Isosceles trapezium', eq:'∠A = ∠B,  ∠C = ∠D',
+     explain:'If the non-parallel sides are equal (AD = BC), the base angles are equal and the diagonals are equal (AC = BD).<br><b>Trick to prove it:</b> through C draw CE ∥ DA to meet AB at E. AECD is a parallelogram, so CE = AD = BC. △BCE is isosceles, which gives ∠A = ∠B.',
+     ex:{given:'AD = BC, ∠A = 70°', steps:['∠B = ∠A = 70°','∠D = 180° − 70° = 110°','∠C = ∠D = 110°'], ans:'70°, 70°, 110°, 110°'}}]},
+ { id:'mid-point-theorem', tag:'Class 9', name:'Mid-point Theorem', vars:'E = mid-point of AB, F = mid-point of AC', draw:'midpoint',
+   tabs:[
+    {k:'thm', short:'Theorem', full:'Mid-point theorem', th:'Theorem 8.9', eq:'EF ∥ BC,  EF = ½ BC',
+     explain:'The segment joining the mid-points of two sides of a triangle is parallel to the third side and is half of it.<br><b>Proof idea:</b> extend EF to D so that FD = EF, and join CD. △AEF ≅ △CDF (SAS), so CD = AE = BE and CD ∥ BA. So EBCD is a parallelogram, which gives EF ∥ BC and EF = ½ ED = ½ BC.',
+     ex:{given:'△ABC has sides 7 cm, 8 cm and 9 cm', steps:['Joining the mid-points makes a smaller triangle','Each new side is half the side it is parallel to: 3.5, 4, 4.5','Perimeter = 3.5 + 4 + 4.5'], ans:'Perimeter = 12 cm'}},
+    {k:'conv', short:'Converse', full:'Converse of the mid-point theorem', th:'Theorem 8.10', eq:'EF ∥ BC  ⇒  AF = FC',
+     explain:'A line drawn through the mid-point of one side of a triangle, parallel to another side, bisects the third side.',
+     ex:{given:'E is the mid-point of AB, EF ∥ BC, AC = 10 cm', steps:['By Theorem 8.10, F is the mid-point of AC','AF = FC = 10 ÷ 2'], ans:'AF = FC = 5 cm'}}],
+   note:'The mid-point theorem is the key to most <b>Exercise 8.2</b> questions.'},
+ { id:'mid-points-quadrilateral', tag:'Tricky', name:'Mid-points of a Quadrilateral', vars:'P, Q, R, S = mid-points of AB, BC, CD, DA', draw:'midquad',
+   tabs:[
+    {k:'any', short:'Any quad', full:'Always a parallelogram', eq:'PQ ∥ SR,  PQ = SR = ½ AC',
+     explain:'Join the mid-points of the sides of <b>any</b> quadrilateral in order and you always get a parallelogram. In △ABC the mid-point theorem gives PQ ∥ AC and PQ = ½ AC. In △ADC it gives SR ∥ AC and SR = ½ AC. So PQ and SR are equal and parallel, and PQRS is a parallelogram (Theorem 8.8).',
+     ex:{given:'Diagonals AC = 10 cm, BD = 14 cm', steps:['PQ = SR = ½ AC = 5 cm','QR = PS = ½ BD = 7 cm','Perimeter = 2(5 + 7)'], ans:'Perimeter of PQRS = 24 cm'}},
+    {k:'special', short:'Special', full:'Special cases', eq:'Rectangle  →  Rhombus',
+     explain:'The shape of PQRS depends on the diagonals of ABCD:<ul><li>A <b>rectangle</b> (equal diagonals) gives a <b>rhombus</b></li><li>A <b>rhombus</b> (diagonals at 90°) gives a <b>rectangle</b></li><li>A <b>square</b> gives a <b>square</b></li></ul>',
+     ex:{given:'Rectangle ABCD with diagonals of 12 cm', steps:['Each side of PQRS = ½ × diagonal = 6 cm','All four sides are equal'], ans:'PQRS is a rhombus with side 6 cm'}}]}
+];
+
+// ---------- Chapters ----------
+const CHAPTERS = [
+  { id:'ch8', no:8, name:'Quadrilaterals', unit:'Topic', count:'topics', items:QUADS, draws:QDRAW,
+    hint:'Tap a topic to see its theorem with a diagram. <b>Class 9</b> = exam focus · <b>Basics</b> = used inside questions · <b>Tricky</b> = common exam traps.',
+    revMark:'∠ sum = 360°<br>EF = ½ BC<br>AC ⊥ BD',
+    legend: () => '<span>Same marks = equal lengths</span><span>Arrows = parallel lines</span><span><i class="sw on"></i>Same colour = equal</span>',
+    rev: ch => `<div class="tbl"><table class="rev8">
+      <thead><tr><th>Topic</th><th>Key results</th></tr></thead>
+      <tbody>${ch.items.map(s => `<tr>
+        <td><button data-go="${s.id}">${s.name}</button></td>
+        <td>${s.tabs.map(t => `<div class="rrow"><span class="f">${t.eq}</span>${t.th ? ` <small>${t.th}</small>` : ''}</div>`).join('')}</td></tr>`).join('')}</tbody>
+    </table></div>
+    <div class="note" style="margin-top:16px"><b>Family tree:</b> square ⊂ rectangle and rhombus ⊂ parallelogram ⊂ quadrilateral. A shape keeps every property of the shapes above it.</div>`,
+    revSub: 'Tap a topic to open its diagram.' },
+  { id:'ch14', no:14, name:'Surface Area and Volume', unit:'Formula', count:'shapes', items:SHAPES, draws:DRAW,
+    hint:'Tap a shape to see its formulas. <b>Class 9</b> = exam focus · <b>Basics</b> = used inside questions · <b>Tricky</b> = shapes with a hole or thickness.',
+    revMark:'πr²h<br>⅓πr²h<br>4πr²',
+    legend: (k, s) => (k === 'vol'
+      ? `<span><i class="sw vol"></i>Space inside the shape</span>`
+      : `<span><i class="sw on"></i>Surfaces included</span>${s.id === 'sphere' || s.id === 'spherical-shell' ? '' : '<span><i class="sw off"></i>Not included</span>'}`) + '<span>Dashed lines = hidden edges</span>',
+    rev: ch => {
+      const cell = (s, ks) => { const t = s.tabs.find(x => ks.includes(x.k)); return t ? t.eq : '—'; };
+      return `<div class="tbl"><table>
+      <thead><tr><th>Shape</th><th>CSA / LSA</th><th>TSA</th><th>Volume</th></tr></thead>
+      <tbody>${ch.items.map(s => `<tr>
+        <td><button data-go="${s.id}">${s.name}</button></td>
+        <td class="f">${s.id === 'sphere' ? '4πr<sup>2</sup>' : s.id === 'spherical-shell' ? '4πR<sup>2</sup> (outer)' : cell(s, ['lsa'])}</td>
+        <td class="f">${s.id === 'spherical-shell' ? '—' : cell(s, ['tsa'])}</td>
+        <td class="f">${cell(s, ['vol'])}</td></tr>`).join('')}</tbody>
+    </table></div>
+    <div class="note" style="margin-top:16px"><b>Units:</b> area in cm² or m², volume in cm³ or m³. 1 m³ = 1000 litres, 1 litre = 1000 cm³.</div>`;
+    },
+    revSub: 'Tap a shape name to open its diagrams. Use π = 22/7 or 3.14.' }
+];
+const ALL = [];
+CHAPTERS.forEach(ch => ch.items.forEach((s, i) => { s.ch = ch; s.i = i; s.fn = ch.draws[s.draw]; ALL.push(s); }));
+
 // ---------- Views ----------
 const app = document.getElementById('app');
 const state = {};
 const HUES = ['#8b7bff','#3fc1ae','#ff8f6b','#4fa8ff','#f06fae','#e0a92e'];
 const hueOf = i => HUES[i % HUES.length];
 const tabOf = s => state[s.id] && s.tabs.find(t => t.k === state[s.id]) ? state[s.id] : s.tabs[0].k;
+const plain = h => h.replace(/<[^>]+>/g, '');
 
-function home(open) {
+function home(openId) {
   app.style.removeProperty('--hue');
-  const cards = SHAPES.map((s, i) => `
-    <button class="card" data-go="${s.id}" aria-label="${s.name}" style="--hue:${hueOf(i)};--i:${i}">
-      <span class="cardtop"><span class="num">Formula ${i + 1}</span><span class="tag tag-${s.tag.replace(' ','').toLowerCase()}">${s.tag}</span></span>
-      ${wrap(DRAW[s.draw](null), s.name)}
-      <h3>${s.name}</h3>
-      <span class="chips">${s.tabs.map(t => `<span class="chip">${t.short}</span>`).join('')}</span>
-    </button>`).join('');
+  const bars = CHAPTERS.map(ch => {
+    const open = ch.id === openId;
+    const cards = ch.items.map((s, i) => `
+      <button class="card" data-go="${s.id}" aria-label="${s.name}" style="--hue:${hueOf(i)};--i:${i}">
+        <span class="cardtop"><span class="num">${ch.unit} ${i + 1}</span><span class="tag tag-${s.tag.replace(' ', '').toLowerCase()}">${s.tag}</span></span>
+        ${wrap(s.fn(null), s.name)}
+        <h3>${s.name}</h3>
+        <span class="chips">${s.tabs.map(t => `<span class="chip">${t.short}</span>`).join('')}</span>
+      </button>`).join('');
+    return `
+    <button class="chbar" data-go="${open ? '' : ch.id}" aria-expanded="${open}">
+      <span class="chno"><small>Ch</small><b>${ch.no}</b></span>
+      <span class="chname">${ch.name}</span>
+      <span class="chmeta">${ch.items.length} ${ch.count} <i>Class 9</i></span>
+      <span class="chev" aria-hidden="true">▼</span>
+    </button>
+    ${open ? `<p class="hint">${ch.hint}</p>
+    <div class="grid">${cards}
+      <button class="card rev" data-go="rev-${ch.id}" aria-label="Quick revision for ${ch.name}" style="--i:${ch.items.length}">
+        <span class="num">All ${ch.count}</span>
+        <span class="rev-mark">${ch.revMark}</span>
+        <h3>Quick Revision</h3>
+        <p>Everything on one page</p>
+      </button>
+    </div>` : ''}`;
+  }).join('');
   app.innerHTML = `
     <header class="chapter">
       <div class="toprow"><h1>Maths</h1><button class="install" id="install" hidden>Install app</button></div>
       <p>Formulas you can see. Tap a chapter to start.</p>
-    </header>
-    <button class="chbar" data-go="${open ? '' : 'ch14'}" aria-expanded="${open}">
-      <span class="chno"><small>Ch</small><b>14</b></span>
-      <span class="chname">Surface Area and Volume</span>
-      <span class="chmeta">${SHAPES.length} shapes <i>Class 9</i></span>
-      <span class="chev" aria-hidden="true">▼</span>
-    </button>
-    ${open ? `<p class="hint">Tap a shape to see its formulas. <b>Class 9</b> = exam focus · <b>Basics</b> = used inside questions · <b>Tricky</b> = shapes with a hole or thickness.</p>
-    <div class="grid">${cards}
-      <button class="card rev" data-go="revision" aria-label="Quick revision" style="--i:${SHAPES.length}">
-        <span class="num">All shapes</span>
-        <span class="rev-mark">πr²h<br>⅓πr²h<br>4πr²</span>
-        <h3>Quick Revision</h3>
-        <p>Every formula on one page</p>
-      </button>
-    </div>` : ''}`;
+    </header>${bars}`;
 }
 
 function detail(s) {
-  const k = tabOf(s), t = s.tabs.find(x => x.k === k), idx = SHAPES.indexOf(s);
-  const prev = SHAPES[idx - 1], next = SHAPES[idx + 1];
+  const ch = s.ch, items = ch.items, idx = s.i;
+  const k = tabOf(s), t = s.tabs.find(x => x.k === k);
+  const prev = items[idx - 1], next = items[idx + 1];
   app.style.setProperty('--hue', hueOf(idx));
-  const legend = k === 'vol'
-    ? `<span><i class="sw vol"></i>Space inside the shape</span>`
-    : `<span><i class="sw on"></i>Surfaces included</span>${s.id === 'sphere' || s.id === 'spherical-shell' ? '' : '<span><i class="sw off"></i>Not included</span>'}`;
+  const eqLong = plain((t.lhs || '') + t.eq).length > 16;
   app.innerHTML = `
-    <button class="back" data-go="ch14">← Ch–14 shapes</button>
+    <button class="back" data-go="${ch.id}">← Ch ${ch.no} ${ch.name}</button>
     <header class="dhead">
-      <span class="eyebrow">Formula ${idx + 1} of ${SHAPES.length} · ${s.tag}</span>
+      <span class="eyebrow">${ch.unit} ${idx + 1} of ${items.length} · ${s.tag}</span>
       <h2>${s.name}</h2>
       <div class="vars">${s.vars}</div>
     </header>
-    <div class="tabs" role="tablist">
+    ${s.tabs.length > 1 ? `<div class="tabs" role="tablist">
       ${s.tabs.map(x => `<button class="tab" role="tab" id="tab-${s.id}-${x.k}" aria-selected="${x.k === k}" data-tab="${x.k}">${x.short}<small>${x.full}</small></button>`).join('')}
-    </div>
-    <section class="panel" role="tabpanel" aria-labelledby="tab-${s.id}-${k}">
+    </div>` : ''}
+    <section class="panel" ${s.tabs.length > 1 ? `role="tabpanel" aria-labelledby="tab-${s.id}-${k}"` : ''}>
       <div class="fig">
-        ${wrap(DRAW[s.draw](k), s.name + ' – ' + t.full)}
-        <div class="legend">${legend}<span>Dashed lines = hidden edges</span></div>
+        ${wrap(s.fn(k), s.name + ' – ' + t.full)}
+        <div class="legend">${ch.legend(k, s)}</div>
       </div>
       <div class="formula">
-        <div class="name">${t.full}</div>
-        <div class="eq"><span class="lhs">${t.lhs} =</span> ${t.eq}</div>
+        <div class="name">${t.th ? `${t.th} · ` : ''}${t.full}</div>
+        <div class="eq${eqLong ? ' long' : ''}">${t.lhs ? `<span class="lhs">${t.lhs} =</span> ` : ''}${t.eq}</div>
       </div>
       <div class="section">
         <h3>How it works</h3>
-        <p>${t.explain}</p>
+        <div class="explain">${t.explain}</div>
       </div>
       <div class="example">
         <h3>Example</h3>
@@ -442,36 +702,29 @@ function detail(s) {
     </section>
     <nav class="pager">
       ${prev ? `<button data-go="${prev.id}">← ${prev.name}</button>` : '<span class="sp"></span>'}
-      ${next ? `<button data-go="${next.id}">${next.name} →</button>` : `<button data-go="revision">Quick Revision →</button>`}
+      ${next ? `<button data-go="${next.id}">${next.name} →</button>` : `<button data-go="rev-${ch.id}">Quick Revision →</button>`}
     </nav>`;
   app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { state[s.id] = b.dataset.tab; detail(s); document.getElementById(`tab-${s.id}-${b.dataset.tab}`).focus(); });
 }
 
-function revision() {
+function revision(ch) {
   app.style.removeProperty('--hue');
-  const cell = (s, ks) => { const t = s.tabs.find(x => ks.includes(x.k)); return t ? t.eq : '—'; };
   app.innerHTML = `
-    <button class="back" data-go="ch14">← Ch–14 shapes</button>
+    <button class="back" data-go="${ch.id}">← Ch ${ch.no} ${ch.name}</button>
     <header class="dhead">
-      <span class="eyebrow">Surface Area and Volume</span>
+      <span class="eyebrow">${ch.name}</span>
       <h2>Quick Revision</h2>
-      <div class="vars">Tap a shape name to open its diagrams. Use π = 22/7 or 3.14.</div>
+      <div class="vars">${ch.revSub}</div>
     </header>
-    <div class="tbl"><table>
-      <thead><tr><th>Shape</th><th>CSA / LSA</th><th>TSA</th><th>Volume</th></tr></thead>
-      <tbody>${SHAPES.map(s => `<tr>
-        <td><button data-go="${s.id}">${s.name}</button></td>
-        <td class="f">${s.id === 'sphere' ? '4πr<sup>2</sup>' : s.id === 'spherical-shell' ? '4πR<sup>2</sup> (outer)' : cell(s, ['lsa'])}</td>
-        <td class="f">${s.id === 'spherical-shell' ? '—' : cell(s, ['tsa'])}</td>
-        <td class="f">${cell(s, ['vol'])}</td></tr>`).join('')}</tbody>
-    </table></div>
-    <div class="note" style="margin-top:16px"><b>Units:</b> area in cm² or m², volume in cm³ or m³. 1 m³ = 1000 litres, 1 litre = 1000 cm³.</div>`;
+    ${ch.rev(ch)}`;
 }
 
 function route() {
   const id = decodeURIComponent(location.hash.slice(1));
-  const s = SHAPES.find(x => x.id === id);
-  if (s) detail(s); else if (id === 'revision') revision(); else home(id === 'ch14');
+  const s = ALL.find(x => x.id === id);
+  const rc = CHAPTERS.find(c => 'rev-' + c.id === id) || (id === 'revision' ? CHAPTERS.find(c => c.id === 'ch14') : null);
+  const ch = CHAPTERS.find(c => c.id === id);
+  if (s) detail(s); else if (rc) revision(rc); else home(ch ? ch.id : null);
   window.scrollTo(0, 0);
 }
 app.addEventListener('click', e => {

@@ -1,7 +1,7 @@
 {
   "name": "Maths",
   "short_name": "Maths",
-  "description": "Maths formulas with diagrams: Ch-14 Surface Area and Volume.",
+  "description": "Class 9 maths formulas with diagrams: Quadrilaterals, Surface Area and Volume.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
