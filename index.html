@@ -126,6 +126,18 @@ table.rev8 td:first-child button{white-space:normal}
 .rrow{padding:2px 0}
 .rrow .f{font-family:var(--font-math);font-style:italic;font-size:1.02rem}
 .rrow small{color:var(--muted);font-size:.72rem;white-space:nowrap}
+/* Sequences and Series */
+.bar{fill:var(--face);fill-opacity:.75;stroke:var(--ink);stroke-width:1.1;stroke-opacity:.7}
+.bar.on{fill:var(--hl);fill-opacity:.88}
+.bar.v{fill:var(--vol);fill-opacity:.85}
+.dt{stroke:var(--ink);stroke-width:1;stroke-opacity:.5}
+.dt.on{fill:var(--hl)} .dt.v{fill:var(--vol)}
+.gl{stroke:#10233a;stroke-opacity:.35;stroke-width:1}
+.vx.sm{font-size:11px;font-weight:400}
+.vx.dark{fill:#10233a;font-weight:600}
+.vx.big{font-size:20px}
+.tag-ap{background:var(--vol);color:#0c2a26}
+.tag-gp{background:var(--hl);color:#2a2105}
 @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
 /* Detail */
@@ -583,19 +595,244 @@ const QUADS = [
      ex:{given:'Rectangle ABCD with diagonals of 12 cm', steps:['Each side of PQRS = ½ × diagonal = 6 cm','All four sides are equal'], ans:'PQRS is a rhombus with side 6 cm'}}]}
 ];
 
+// ---------- Sequences and Series: drawing ----------
+const BASE = 172;
+const txt = (x, y, t, cls = 'vx') => `<text x="${r1(x)}" y="${r1(y)}" class="${cls}">${t}</text>`;
+const axis = (x1 = 22, x2 = 222) => ln([x1, BASE], [x2, BASE], 'st');
+const rct = (x, y, w, h, cls) => `<rect x="${r1(x)}" y="${r1(y)}" width="${r1(w)}" height="${r1(h)}" rx="2.5" class="${cls}"/>`;
+const SUBS = '₀₁₂₃₄₅₆₇₈₉';
+const curve = (a, b, lift, cls = 'tk') => `<path d="M${pt(a)} Q${r1((a[0] + b[0]) / 2)},${r1(Math.min(a[1], b[1]) - lift)} ${pt(b)}" class="${cls}"/>`;
+
+const SDRAW = {
+  seqbasic: k => {
+    const vals = [2, 5, 10, 17, 26];
+    if (k === 'series') {
+      let o = axis();
+      vals.forEach((v, i) => { const x = 22 + i * 28; o += rct(x, BASE - v * 2, 20, v * 2, 'bar') + txt(x + 10, BASE - v * 2 - 5, v, 'vx sm') + txt(x + 10, 189, 'a' + SUBS[i + 1], 'vx sm'); });
+      let y = BASE; vals.forEach((v, i) => { y -= v * 2; o += rct(180, y, 34, v * 2, 'bar ' + (i % 2 ? 'v' : 'on')); });
+      return o + txt(164, 128, '→', 'vx') + txt(197, y - 8, 'S₅ = 60', 'lbl');
+    }
+    let o = axis();
+    vals.forEach((v, i) => { const x = 34 + i * 38; o += rct(x, BASE - v * 5, 26, v * 5, k && i === 3 ? 'bar on' : 'bar') +
+      (k ? txt(x + 13, BASE - v * 5 - 6, v, 'vx sm') + txt(x + 13, 189, 'a' + SUBS[i + 1], 'vx sm') : ''); });
+    return o;
+  },
+  apnth: k => {
+    const a = 3, d = 4, n = 5, u = 7, w = 26, g = 12, x0 = 30;
+    let o = axis();
+    for (let i = 0; i < n; i++) {
+      const v = a + i * d, x = x0 + i * (w + g), top = BASE - v * u;
+      const on = k && (i === 0 || (i === n - 1 && k !== 'count'));
+      o += rct(x, top, w, v * u, on ? 'bar on' : 'bar');
+      if (i > 0) o += rct(x, top, w, d * u, 'bar v') + (k ? txt(x + w / 2, top + d * u / 2 + 4, 'd', 'vx sm dark') : '');
+      if (k) {
+        const lab = k === 'count' ? v : i === 0 ? 'a' : i === n - 1 ? (k === 'last' ? 'l' : 'aₙ') : v;
+        o += txt(x + w / 2, top - 6, lab, i === 0 || i === n - 1 ? 'lbl' : 'vx sm') + txt(x + w / 2, 189, k === 'count' ? 'n=' + (i + 1) : i + 1, 'vx sm');
+      }
+    }
+    return o;
+  },
+  apsum: k => {
+    const a = 3, d = 4, n = 5, l = a + (n - 1) * d, u = 6, w = 28, g = 4, x0 = 42, top = BASE - (a + l) * u;
+    let o = axis(24, 216);
+    for (let i = 0; i < n; i++) {
+      const v = a + i * d, x = x0 + i * (w + g);
+      o += rct(x, BASE - v * u, w, v * u, 'bar on');
+      if (k || true) o += rct(x, top, w, (a + l - v) * u, 'bar v');
+    }
+    if (k) {
+      const xr = x0 + n * (w + g) + 6;
+      o += ln([xr, top], [xr, BASE], 'dim') + txt(x0 + n * (w + g) / 2, top - 9, k === 'last' ? 'each column = a + l' : 'each column = 2a + (n − 1)d', 'vx sm') +
+        txt(x0 + n * (w + g) / 2, 189, 'n columns', 'vx sm');
+    }
+    return o;
+  },
+  aptricks: k => {
+    if (k === 'choose') {
+      let o = ln([20, 80], [220, 80], 'st') + ln([20, 158], [220, 158], 'st');
+      const p3 = [50, 120, 190], l3 = ['a − d', 'a', 'a + d'], p4 = [30, 90, 150, 210], l4 = ['a − 3d', 'a − d', 'a + d', 'a + 3d'];
+      p3.forEach((x, i) => { o += qdot([x, 80]) + txt(x, 102, l3[i], 'vx sm'); if (i) o += curve([p3[i - 1], 76], [x, 76], 16) + txt((x + p3[i - 1]) / 2, 58, 'd', 'lbl'); });
+      p4.forEach((x, i) => { o += qdot([x, 158]) + txt(x, 180, l4[i], 'vx sm'); if (i) o += curve([p4[i - 1], 154], [x, 154], 14) + txt((x + p4[i - 1]) / 2, 139, '2d', 'lbl'); });
+      return o + txt(120, 30, '3 terms', 'vx sm') + txt(120, 118, '4 terms', 'vx sm');
+    }
+    const xs = [30, 75, 120, 165, 210], vs = [3, 7, 11, 15, 19];
+    let o = ln([16, 120], [224, 120], 'st');
+    xs.forEach((x, i) => {
+      o += `<circle cx="${x}" cy="120" r="6" class="dt ${i === 0 || i === 4 ? 'on' : 'v'}"/>`;
+      if (k) o += txt(x, 144, vs[i], 'vx sm');
+      if (i) o += curve([xs[i - 1], 112], [x, 112], 18) + (k ? txt((x + xs[i - 1]) / 2, 92, 'd', 'lbl') : '');
+    });
+    return o + (k ? txt(120, 172, '3 means inserted between 3 and 19', 'vx sm') : '');
+  },
+  gpnth: k => {
+    const vals = [1, 2, 4, 8, 16], u = 8, w = 26, g = 12, x0 = 30;
+    let o = axis();
+    vals.forEach((v, i) => {
+      const x = x0 + i * (w + g), top = BASE - v * u;
+      const on = k === 'nth' ? (i === 0 || i === 4) : k === 'mean' ? (i >= 1 && i <= 3) : false;
+      o += rct(x, top, w, v * u, on ? (k === 'mean' && i === 2 ? 'bar v' : 'bar on') : 'bar');
+      if (k) o += txt(x + w / 2, 189, k === 'nth' && i === 0 ? 'a' : k === 'nth' && i === 4 ? 'aₙ' : v, k === 'nth' && (i === 0 || i === 4) ? 'lbl' : 'vx sm');
+      if (i) { const px = x0 + (i - 1) * (w + g) + w / 2, ptop = BASE - vals[i - 1] * u;
+        o += curve([px, ptop - 4], [x + w / 2, top - 4], 14) + (k === 'nth' ? txt((px + x + w / 2) / 2, Math.min(ptop, top) - 14, '×r', 'lbl') : ''); }
+    });
+    return o + (k === 'mean' ? txt(120, 30, '4² = 2 × 8', 'lbl') : '');
+  },
+  gpsum: k => {
+    if (k === 'inf' || !k) {
+      let x = 45, y = 24, W = 150, H = 150, o = '';
+      const labs = ['½', '¼', '⅛', '¹⁄₁₆'];
+      for (let i = 0; i < 8; i++) {
+        const cls = i % 2 ? 'bar v' : 'bar on';
+        if (i % 2 === 0) { const w = W / 2; o += rct(x, y, w, H, cls); if (k && labs[i]) o += txt(x + w / 2, y + H / 2 + 7, labs[i], 'vx dark big'); x += w; W -= w; }
+        else { const h = H / 2; o += rct(x, y, W, h, cls); if (k && labs[i]) o += txt(x + W / 2, y + h / 2 + 7, labs[i], i === 3 ? 'vx sm dark' : 'vx dark big'); y += h; H -= h; }
+      }
+      return o + `<rect x="45" y="24" width="150" height="150" class="st"/>` + (k ? txt(120, 192, 'whole square = 1', 'vx sm') : '');
+    }
+    const vals = [1, 2, 4, 8], u = 7;
+    let o = axis();
+    vals.forEach((v, i) => { const x = 22 + i * 32; o += rct(x, BASE - v * u, 24, v * u, 'bar') + txt(x + 12, BASE - v * u - 5, v, 'vx sm'); });
+    o += txt(150, 130, '=', 'vx');
+    o += `<rect x="170" y="${BASE - 16 * u}" width="34" height="${16 * u}" rx="2.5" class="diag"/>`;
+    let y = BASE; vals.forEach((v, i) => { y -= v * u; o += rct(170, y, 34, v * u, 'bar ' + (i % 2 ? 'v' : 'on')); });
+    return o + txt(187, BASE - 16 * u - 8, '2⁴ − 1 = 15', 'lbl') + txt(187, 189, 'S₄', 'vx sm');
+  },
+  amgm: k => {
+    const L = 20, R = 220, C = 120, Y = 165, Px = 170, r = 100, h = Math.sqrt(r * r - (Px - C) ** 2);
+    let o = pa(`M${L},${Y} A${r},${r} 0 0 1 ${R},${Y} Z`, 'f-off st');
+    const amC = !k || k === 'am' || k === 'ineq' ? 'hs' : 'diag', gmC = !k || k === 'gm' || k === 'ineq' ? 'hs2' : 'diag';
+    o += ln([C, Y], [C, Y - r], amC) + ln([Px, Y], [Px, Y - h], gmC) + qdot([C, Y]) + qdot([Px, Y]);
+    o += ln([L, Y - 5], [L, Y + 5], 'tk') + ln([Px, Y - 5], [Px, Y + 5], 'tk') + ln([R, Y - 5], [R, Y + 5], 'tk');
+    o += txt((L + Px) / 2, Y + 20, 'a', 'lbl') + txt((Px + R) / 2, Y + 20, 'b', 'lbl');
+    if (k) o += txt(C - 18, Y - r / 2, 'AM', 'vx sm') + txt(Px + 20, Y - h / 2, 'GM', 'vx sm');
+    if (k === 'ineq') o += txt(120, 40, 'AM ≥ GM', 'lbl');
+    return o;
+  },
+  special: k => {
+    if (k === 'n2') {
+      let o = axis(20, 220), x = 32;
+      [1, 2, 3, 4].forEach((s, i) => {
+        const S = s * 13;
+        o += rct(x, BASE - S, S, S, 'bar ' + (i % 2 ? 'v' : 'on'));
+        for (let j = 1; j < s; j++) o += ln([x + j * 13, BASE - S], [x + j * 13, BASE], 'gl') + ln([x, BASE - j * 13], [x + S, BASE - j * 13], 'gl');
+        o += txt(x + S / 2, 189, s + '²', 'vx sm'); x += S + 12;
+      });
+      return o + txt(120, 70, '1 + 4 + 9 + 16 = 30', 'lbl');
+    }
+    if (k === 'n3') {
+      const u = 22, x0 = 54, y0 = 32;
+      let o = rct(x0, y0, 6 * u, 6 * u, 'bar v') + rct(x0, y0, 3 * u, 3 * u, 'bar on') + rct(x0, y0, u, u, 'bar v');
+      return o + txt(x0 + 4.5 * u, y0 + 4.5 * u + 5, '27 = 3³', 'vx sm dark') + txt(x0 + 2 * u, y0 + 2 * u + 5, '8', 'vx sm dark') + txt(x0 + u / 2, y0 + u / 2 + 4, '1', 'vx sm dark') +
+        txt(x0 + 3 * u, y0 - 9, '1 + 2 + 3 = 6', 'lbl') + txt(x0 + 3 * u, y0 + 6 * u + 20, '6 × 6 = 36 = 1 + 8 + 27', 'vx sm');
+    }
+    const n = 4, sp = 30, x0 = 60, y0 = 46;
+    let o = '';
+    for (let i = 0; i < n; i++) for (let j = 0; j <= n; j++)
+      o += `<circle cx="${x0 + j * sp}" cy="${y0 + i * sp}" r="10" class="dt ${j <= i ? 'on' : 'v'}"/>`;
+    return o + (k ? txt(x0 + 2 * sp, y0 + n * sp + 6, 'n + 1 = 5 columns', 'vx sm') + txt(x0 - 32, y0 + 1.5 * sp + 4, 'n = 4', 'vx sm') : '');
+  }
+};
+
+// ---------- Sequences and Series: content ----------
+const SEQS = [
+ { id:'sequence-basics', tag:'Basics', name:'Sequence and Series', vars:'a<sub>1</sub>, a<sub>2</sub>, a<sub>3</sub>, … are the terms; n is the position', draw:'seqbasic',
+   leg: k => k === 'series' ? '<span>Each bar = one term</span><span><i class="sw on"></i><i class="sw vol"></i>Stacked = their sum</span>' : '<span>Each bar = one term</span><span><i class="sw on"></i>a<sub>4</sub> = 4² + 1 = 17</span>',
+   tabs:[
+    {k:'seq', short:'Sequence', full:'General term', eq:'a<sub>1</sub>, a<sub>2</sub>, a<sub>3</sub>, …, a<sub>n</sub>',
+     explain:'A sequence is a list of numbers in a definite order. The general term a<sub>n</sub> is a rule that gives any term from its position n. A sequence is <b>finite</b> if it stops and <b>infinite</b> if it goes on forever.',
+     ex:{given:'a<sub>n</sub> = n² + 1', steps:['a<sub>1</sub> = 1 + 1 = 2','a<sub>2</sub> = 4 + 1 = 5','a<sub>3</sub> = 9 + 1 = 10'], ans:'First three terms: 2, 5, 10'}},
+    {k:'series', short:'Series', full:'Sum of the terms', lhs:'S<sub>n</sub>', eq:'a<sub>1</sub> + a<sub>2</sub> + … + a<sub>n</sub>',
+     explain:'A series is what you get when you add the terms of a sequence. S<sub>n</sub> is the sum of the first n terms.<br><b>Useful trick:</b> a<sub>n</sub> = S<sub>n</sub> − S<sub>n−1</sub>.',
+     ex:{given:'S<sub>n</sub> = n² + 2n', steps:['S<sub>5</sub> = 25 + 10 = 35','S<sub>4</sub> = 16 + 8 = 24','a<sub>5</sub> = S<sub>5</sub> − S<sub>4</sub>'], ans:'a<sub>5</sub> = 11'}}]},
+ { id:'ap-nth-term', tag:'AP', name:'AP: nth Term', vars:'<span class="m">a</span> = first term, <span class="m">d</span> = common difference, <span class="m">l</span> = last term', draw:'apnth',
+   leg: () => '<span><i class="sw on"></i>First and last terms</span><span><i class="sw vol"></i>Each step adds d</span>',
+   tabs:[
+    {k:'nth', short:'nth term', full:'General term of an AP', lhs:'a<sub>n</sub>', eq:'a + (n − 1)d',
+     explain:'In an arithmetic progression (AP) you add the same number d every time, so d = a<sub>2</sub> − a<sub>1</sub>. To reach the nth term you start at a and take (n − 1) steps of d. d can be negative or a fraction.',
+     ex:{given:'AP: 3, 7, 11, …', steps:['a = 3, d = 7 − 3 = 4','a<sub>20</sub> = 3 + 19 × 4','= 3 + 76'], ans:'a<sub>20</sub> = 79'}},
+    {k:'count', short:'How many', full:'Number of terms', lhs:'n', eq:'(l − a) ÷ d + 1',
+     explain:'Rearrange l = a + (n − 1)d to find how many terms an AP has when you know the first term, the last term and d.',
+     ex:{given:'AP: 7, 13, 19, …, 205', steps:['a = 7, d = 6, l = 205','n = (205 − 7) ÷ 6 + 1','= 33 + 1'], ans:'n = 34 terms'}},
+    {k:'last', short:'From end', full:'nth term from the end', eq:'l − (n − 1)d',
+     explain:'Counting from the end is the same as reversing the AP: start at the last term l and use common difference −d.',
+     ex:{given:'AP: 3, 8, 13, …, 253', steps:['l = 253, d = 5','20th term from the end = 253 − 19 × 5','= 253 − 95'], ans:'158'}}]},
+ { id:'ap-sum', tag:'AP', name:'AP: Sum', vars:'<span class="m">n</span> terms, first term <span class="m">a</span>, last term <span class="m">l</span>', draw:'apsum',
+   leg: () => '<span><i class="sw on"></i>The AP</span><span><i class="sw vol"></i>The same AP upside down</span>',
+   tabs:[
+    {k:'sum', short:'Sₙ', full:'Sum of n terms', lhs:'S<sub>n</sub>', eq:'½n[2a + (n − 1)d]',
+     explain:'Write the sum forwards and backwards and add them. Every pair adds up to the same total, 2a + (n − 1)d, and there are n pairs. That is twice the sum, so halve it. In the picture the AP (yellow) and the same AP upside down (teal) make a rectangle.',
+     ex:{given:'First 20 terms of 3, 7, 11, …', steps:['a = 3, d = 4, n = 20','S<sub>20</sub> = ½ × 20 × [6 + 19 × 4]','= 10 × 82'], ans:'S<sub>20</sub> = 820'}},
+    {k:'last', short:'Using l', full:'When the last term is known', lhs:'S<sub>n</sub>', eq:'½n(a + l)',
+     explain:'If you know the first term a and the last term l, the sum is n times the average of the first and last terms.',
+     ex:{given:'1 + 2 + 3 + … + 100', steps:['a = 1, l = 100, n = 100','S = ½ × 100 × (1 + 100)'], ans:'S = 5050'}}]},
+ { id:'ap-tricks', tag:'Tricky', name:'AP Tricks', vars:'Shortcuts for AP questions', draw:'aptricks',
+   leg: k => k === 'choose' ? '<span>The d cancels when you add the terms</span>' : '<span><i class="sw on"></i>Given numbers</span><span><i class="sw vol"></i>Means inserted</span>',
+   tabs:[
+    {k:'mean', short:'Middle', full:'Arithmetic mean', eq:'2b = a + c',
+     explain:'If a, b, c are in AP, the middle term is the average of its neighbours: b = (a + c) ÷ 2. This is the arithmetic mean (AM).<br>To insert n means between a and b, use d = (b − a) ÷ (n + 1).',
+     ex:{given:'Insert 3 arithmetic means between 3 and 19', steps:['5 terms in total, so d = (19 − 3) ÷ 4 = 4','Add 4 each time'], ans:'7, 11, 15'}},
+    {k:'choose', short:'Pick terms', full:'Choosing unknown terms', eq:'a − d,  a,  a + d',
+     explain:'When a question gives the sum of 3 terms in AP, call them a − d, a, a + d: the d cancels when you add them. For 4 terms use a − 3d, a − d, a + d, a + 3d, which have a common difference of 2d.',
+     ex:{given:'Three numbers in AP add up to 24 and multiply to 440', steps:['(a − d) + a + (a + d) = 3a = 24, so a = 8','(8 − d) × 8 × (8 + d) = 440','64 − d² = 55, so d = ±3'], ans:'The numbers are 5, 8, 11'}}]},
+ { id:'gp-nth-term', tag:'GP', name:'GP: nth Term', vars:'<span class="m">a</span> = first term, <span class="m">r</span> = common ratio', draw:'gpnth',
+   leg: k => k === 'mean' ? '<span><i class="sw vol"></i>Middle term</span><span><i class="sw on"></i>Its neighbours</span>' : '<span>Each arrow multiplies by r</span>',
+   tabs:[
+    {k:'nth', short:'nth term', full:'General term of a GP', lhs:'a<sub>n</sub>', eq:'ar<sup>n − 1</sup>',
+     explain:'In a geometric progression (GP) you multiply by the same number r every time, so r = a<sub>2</sub> ÷ a<sub>1</sub>. To reach the nth term you start at a and multiply by r, (n − 1) times.',
+     ex:{given:'GP: 2, 6, 18, …', steps:['a = 2, r = 6 ÷ 2 = 3','a<sub>6</sub> = 2 × 3<sup>5</sup>','= 2 × 243'], ans:'a<sub>6</sub> = 486'}},
+    {k:'mean', short:'Middle', full:'Geometric mean', eq:'b² = ac',
+     explain:'If a, b, c are in GP, the middle term squared equals the product of its neighbours, so b = √(ac). This is the geometric mean (GM).<br>For 3 unknown terms in GP, use a/r, a, ar: the r cancels when you multiply them.',
+     ex:{given:'Find the GM of 4 and 16', steps:['b² = 4 × 16 = 64','b = √64'], ans:'GM = 8, so 4, 8, 16 is a GP'}}]},
+ { id:'gp-sum', tag:'GP', name:'GP: Sum', vars:'<span class="m">n</span> terms, first term <span class="m">a</span>, ratio <span class="m">r</span>', draw:'gpsum',
+   leg: k => k === 'inf' ? '<span>½ + ¼ + ⅛ + … fills one whole square</span>' : '<span>1 + 2 + 4 + 8 is one less than 16</span>',
+   tabs:[
+    {k:'fin', short:'Sₙ', full:'Sum of n terms', lhs:'S<sub>n</sub>', eq:'a(r<sup>n</sup> − 1) ÷ (r − 1)',
+     explain:'Use this when r ≠ 1. Multiply S<sub>n</sub> by r and subtract: almost every term cancels, leaving S<sub>n</sub>(r − 1) = a(r<sup>n</sup> − 1).<br>When r &lt; 1 it is neater to write S<sub>n</sub> = a(1 − r<sup>n</sup>) ÷ (1 − r). If r = 1, every term is a, so S<sub>n</sub> = na.',
+     ex:{given:'1 + 2 + 4 + 8 + … (10 terms)', steps:['a = 1, r = 2, n = 10','S<sub>10</sub> = 1 × (2<sup>10</sup> − 1) ÷ (2 − 1)','= 1024 − 1'], ans:'S<sub>10</sub> = 1023'}},
+    {k:'inf', short:'Infinite', full:'Sum to infinity', lhs:'S<sub>∞</sub>', eq:'a ÷ (1 − r)',
+     explain:'This works only when −1 &lt; r &lt; 1. The terms shrink towards 0, so r<sup>n</sup> → 0 and the sum settles at a ÷ (1 − r). In the picture, ½ + ¼ + ⅛ + … fills exactly one whole square.',
+     ex:{given:'½ + ¼ + ⅛ + …', steps:['a = ½, r = ½','S<sub>∞</sub> = ½ ÷ (1 − ½)'], ans:'S<sub>∞</sub> = 1'}}]},
+ { id:'am-gm', tag:'Tricky', name:'AM and GM', vars:'Two positive numbers <span class="m">a</span> and <span class="m">b</span>', draw:'amgm',
+   leg: () => '<span><i class="sw on"></i>AM = radius</span><span><i class="sw vol"></i>GM = height</span>',
+   tabs:[
+    {k:'am', short:'AM', full:'Arithmetic mean', lhs:'AM', eq:'(a + b) ÷ 2',
+     explain:'The arithmetic mean is the ordinary average. In the picture, a and b together make the diameter of the semicircle, so the radius is (a + b) ÷ 2.',
+     ex:{given:'a = 4, b = 16', steps:['AM = (4 + 16) ÷ 2'], ans:'AM = 10'}},
+    {k:'gm', short:'GM', full:'Geometric mean', lhs:'GM', eq:'√(ab)',
+     explain:'The geometric mean is the square root of the product. In the picture it is the height of the line drawn straight up from the point where a meets b.',
+     ex:{given:'a = 4, b = 16', steps:['GM = √(4 × 16) = √64'], ans:'GM = 8'}},
+    {k:'ineq', short:'AM ≥ GM', full:'AM–GM inequality', eq:'AM ≥ GM',
+     explain:'For positive numbers, the AM is always at least the GM. The radius can never be shorter than the height, and they are equal only when a = b.<br><b>Algebra proof:</b> AM − GM = ½(√a − √b)², which is never negative.',
+     ex:{given:'Smallest value of x + 1/x for x &gt; 0', steps:['AM ≥ GM: (x + 1/x) ÷ 2 ≥ √(x × 1/x) = 1','So x + 1/x ≥ 2, equal when x = 1/x'], ans:'Minimum = 2 (at x = 1)'}}]},
+ { id:'special-series', tag:'Tricky', name:'Special Series', vars:'Sums of 1, 2, 3, …, n and their squares and cubes', draw:'special',
+   leg: () => '<span><i class="sw on"></i><i class="sw vol"></i>Pieces fit together exactly</span>',
+   tabs:[
+    {k:'n1', short:'Σ n', full:'Sum of the first n numbers', eq:'1 + 2 + … + n = ½n(n + 1)',
+     explain:'Two copies of the staircase 1 + 2 + … + n fit together into an n × (n + 1) rectangle, so one staircase is half of it. This is just an AP with a = 1 and d = 1.',
+     ex:{given:'1 + 2 + … + 50', steps:['½ × 50 × 51'], ans:'1275'}},
+    {k:'n2', short:'Σ n²', full:'Sum of squares', eq:'1² + 2² + … + n² = n(n + 1)(2n + 1) ÷ 6',
+     explain:'Learn this one by heart. The proof adds up the identity (k + 1)³ − k³ = 3k² + 3k + 1 for k = 1 to n.',
+     ex:{given:'1² + 2² + … + 10²', steps:['10 × 11 × 21 ÷ 6','= 2310 ÷ 6'], ans:'385'}},
+    {k:'n3', short:'Σ n³', full:'Sum of cubes', eq:'1³ + 2³ + … + n³ = [½n(n + 1)]²',
+     explain:'The sum of the cubes is the square of the sum of the numbers. For example 1³ + 2³ + 3³ = (1 + 2 + 3)² = 36. The picture shows a 6 × 6 square split into pieces of 1, 8 and 27.',
+     ex:{given:'1³ + 2³ + … + 10³', steps:['½ × 10 × 11 = 55','55²'], ans:'3025'}}]}
+];
+
 // ---------- Chapters ----------
+const listRev = ch => `<div class="tbl"><table class="rev8">
+      <thead><tr><th>Topic</th><th>Key results</th></tr></thead>
+      <tbody>${ch.items.map(s => `<tr>
+        <td><button data-go="${s.id}">${s.name}</button></td>
+        <td>${s.tabs.map(t => `<div class="rrow"><span class="f">${t.lhs ? t.lhs + ' = ' : ''}${t.eq}</span>${t.th ? ` <small>${t.th}</small>` : ''}</div>`).join('')}</td></tr>`).join('')}</tbody>
+    </table></div>
+    ${ch.revNote ? `<div class="note" style="margin-top:16px">${ch.revNote}</div>` : ''}`;
 const CHAPTERS = [
   { id:'ch8', no:8, name:'Quadrilaterals', unit:'Topic', count:'topics', items:QUADS, draws:QDRAW,
     hint:'Tap a topic to see its theorem with a diagram. <b>Class 9</b> = exam focus · <b>Basics</b> = used inside questions · <b>Tricky</b> = common exam traps.',
     revMark:'∠ sum = 360°<br>EF = ½ BC<br>AC ⊥ BD',
     legend: () => '<span>Same marks = equal lengths</span><span>Arrows = parallel lines</span><span><i class="sw on"></i>Same colour = equal</span>',
-    rev: ch => `<div class="tbl"><table class="rev8">
-      <thead><tr><th>Topic</th><th>Key results</th></tr></thead>
-      <tbody>${ch.items.map(s => `<tr>
-        <td><button data-go="${s.id}">${s.name}</button></td>
-        <td>${s.tabs.map(t => `<div class="rrow"><span class="f">${t.eq}</span>${t.th ? ` <small>${t.th}</small>` : ''}</div>`).join('')}</td></tr>`).join('')}</tbody>
-    </table></div>
-    <div class="note" style="margin-top:16px"><b>Family tree:</b> square ⊂ rectangle and rhombus ⊂ parallelogram ⊂ quadrilateral. A shape keeps every property of the shapes above it.</div>`,
+    rev: ch => listRev(ch),
+    revNote: '<b>Family tree:</b> square ⊂ rectangle and rhombus ⊂ parallelogram ⊂ quadrilateral. A shape keeps every property of the shapes above it.',
+    cls: 'Class 9',
     revSub: 'Tap a topic to open its diagram.' },
   { id:'ch14', no:14, name:'Surface Area and Volume', unit:'Formula', count:'shapes', items:SHAPES, draws:DRAW,
     hint:'Tap a shape to see its formulas. <b>Class 9</b> = exam focus · <b>Basics</b> = used inside questions · <b>Tricky</b> = shapes with a hole or thickness.',
@@ -615,7 +852,14 @@ const CHAPTERS = [
     </table></div>
     <div class="note" style="margin-top:16px"><b>Units:</b> area in cm² or m², volume in cm³ or m³. 1 m³ = 1000 litres, 1 litre = 1000 cm³.</div>`;
     },
-    revSub: 'Tap a shape name to open its diagrams. Use π = 22/7 or 3.14.' }
+    revSub: 'Tap a shape name to open its diagrams. Use π = 22/7 or 3.14.', cls: 'Class 9' },
+  { id:'ch-seq', no:8, cls:'Class 11', name:'Sequences and Series', unit:'Topic', count:'topics', items:SEQS, draws:SDRAW,
+    hint:'Tap a topic to see its formula with a picture. <b>AP</b> = add the same number each time · <b>GP</b> = multiply by the same number · <b>Tricky</b> = means and special sums.',
+    revMark:'a + (n−1)d<br>ar<sup>n−1</sup><br>a ÷ (1−r)',
+    legend: (k, s) => s.leg ? s.leg(k) : '',
+    rev: ch => listRev(ch),
+    revNote: '<b>AP or GP?</b> Subtract neighbouring terms: same difference means AP. Divide them: same ratio means GP.',
+    revSub: 'Tap a topic to open its picture.' }
 ];
 const ALL = [];
 CHAPTERS.forEach(ch => ch.items.forEach((s, i) => { s.ch = ch; s.i = i; s.fn = ch.draws[s.draw]; ALL.push(s); }));
@@ -643,7 +887,7 @@ function home(openId) {
     <button class="chbar" data-go="${open ? '' : ch.id}" aria-expanded="${open}">
       <span class="chno"><small>Ch</small><b>${ch.no}</b></span>
       <span class="chname">${ch.name}</span>
-      <span class="chmeta">${ch.items.length} ${ch.count} <i>Class 9</i></span>
+      <span class="chmeta">${ch.items.length} ${ch.count} <i>${ch.cls || 'Class 9'}</i></span>
       <span class="chev" aria-hidden="true">▼</span>
     </button>
     ${open ? `<p class="hint">${ch.hint}</p>
