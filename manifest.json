@@ -1,7 +1,7 @@
 {
   "name": "Maths",
   "short_name": "Maths",
-  "description": "Maths formulas with pictures: Quadrilaterals, Surface Area and Volume, Sequences and Series.",
+  "description": "Class 9 maths formulas with pictures: Coordinate Geometry, Quadrilaterals, Surface Area and Volume, Sequences and Series.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

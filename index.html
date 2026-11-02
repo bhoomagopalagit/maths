@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Class 9 maths formulas with diagrams: Ch 8 Quadrilaterals and Ch 14 Surface Area and Volume.">
+<meta name="description" content="Class 9 maths formulas with pictures: Coordinate Geometry, Quadrilaterals, Surface Area and Volume, Sequences and Series.">
 <title>Maths</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#11142a">
@@ -101,8 +101,8 @@ h1,h2,h3{font-family:var(--font-display);line-height:1.1;margin:0;text-wrap:bala
 .tag-basics{background:var(--card-2);color:var(--muted)}
 .tag-tricky{background:color-mix(in srgb,var(--accent-2) 22%,transparent);color:var(--accent-2)}
 .hint b{color:var(--ink);font-weight:600}
-.card.rev{grid-column:1/-1}
-@media (min-width:620px) and (max-width:799px){.card.rev{grid-column:auto}}
+.card.rev.wide{grid-column:1/-1}
+@media (min-width:620px) and (max-width:799px){.card.rev.wide{grid-column:auto}}
 /* Ch 8 geometry marks */
 .hs{stroke:var(--hl);stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round;fill:none}
 .hs2{stroke:var(--vol);stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round;fill:none}
@@ -138,6 +138,18 @@ table.rev8 td:first-child button{white-space:normal}
 .vx.big{font-size:20px}
 .tag-ap{background:var(--vol);color:#0c2a26}
 .tag-gp{background:var(--hl);color:#2a2105}
+/* Ch 1 coordinates */
+.gridl{stroke:var(--ink);stroke-opacity:.08;stroke-width:1}
+.ax{stroke:var(--ink);stroke-opacity:.75;stroke-width:1.4}
+.hyp{stroke:var(--accent-2);stroke-width:3.4;stroke-linecap:round;fill:none}
+.mirror{stroke:var(--accent-2);stroke-width:2;stroke-dasharray:6 4;fill:none}
+.pd{fill:var(--hl);stroke:var(--card);stroke-width:1.5}
+.pd.v{fill:var(--vol)} .pd.k{fill:var(--accent-2)}
+.c1{fill:var(--hl);fill-opacity:.12;stroke:var(--hl);stroke-width:2.4}
+.c2{fill:var(--vol);fill-opacity:.12;stroke:var(--vol);stroke-width:2.4}
+.vx.l,.lbl.l{text-anchor:start} .vx.r,.lbl.r{text-anchor:end}
+.vx.num{font-family:var(--font-display);font-size:20px;font-weight:700;fill-opacity:.85}
+.card.rev:not(.wide) .rev-mark{font-size:1.08rem;white-space:nowrap}
 @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
 /* Detail */
@@ -817,6 +829,205 @@ const SEQS = [
      ex:{given:'1³ + 2³ + … + 10³', steps:['½ × 10 × 11 = 55','55²'], ans:'3025'}}]}
 ];
 
+// ---------- Ch 1 Coordinates: drawing ----------
+const cp = (ox, oy, u) => ({ P: (x, y) => [ox + x * u, oy - y * u] });
+function plane(ox, oy, u, xr, yr, lab = true) {
+  let s = '';
+  for (let i = xr[0]; i <= xr[1]; i++) if (i) s += ln([ox + i * u, oy - yr[1] * u], [ox + i * u, oy - yr[0] * u], 'gridl');
+  for (let j = yr[0]; j <= yr[1]; j++) if (j) s += ln([ox + xr[0] * u, oy - j * u], [ox + xr[1] * u, oy - j * u], 'gridl');
+  s += ln([ox + xr[0] * u - 4, oy], [ox + xr[1] * u + 6, oy], 'ax') + ln([ox, oy - yr[0] * u + 4], [ox, oy - yr[1] * u - 6], 'ax');
+  if (lab) s += txt(ox + xr[1] * u + 5, oy - 6, 'x', 'vx sm') + txt(ox + 9, oy - yr[1] * u - 3, 'y', 'vx sm');
+  return s;
+}
+const pdot = (p, cls = 'pd') => `<circle cx="${r1(p[0])}" cy="${r1(p[1])}" r="3.8" class="${cls}"/>`;
+
+const CDRAW = {
+  axes: k => {
+    const { P } = cp(120, 100, 16);
+    let o = plane(120, 100, 16, [-6, 6], [-5, 5]);
+    if (k === 'origin') o += ln([24, 100], [216, 100], 'hs') + ln([120, 180], [120, 20], 'hs2') +
+      txt(206, 91, '+', 'lbl big') + txt(34, 91, '−', 'lbl big') + txt(132, 34, '+', 'lbl big') + txt(132, 178, '−', 'lbl big') +
+      pdot(P(0, 0), 'pd k') + txt(126, 117, 'O (0, 0)', 'vx sm l');
+    if (k === 'onaxis') o += pdot(P(4.5, 0)) + txt(P(4.5, 0)[0], 117, 'B (4.5, 0)', 'vx sm') + pdot(P(-2.9, 0)) + txt(P(-2.9, 0)[0], 117, 'E (−2.9, 0)', 'vx sm') +
+      pdot(P(0, 4), 'pd v') + txt(128, P(0, 4)[1] + 4, 'H (0, 4)', 'vx sm l') + pdot(P(0, -4.5), 'pd v') + txt(128, P(0, -4.5)[1] + 4, 'G (0, −4.5)', 'vx sm l');
+    if (!k) o += pdot(P(0, 0), 'pd k');
+    return o;
+  },
+  quadrants: k => {
+    const { P } = cp(120, 100, 16);
+    let o = '';
+    if (k !== 'order') o += rct(120, 20, 96, 80, 'tint') + rct(24, 20, 96, 80, 'tint2') + rct(24, 100, 96, 80, 'tint') + rct(120, 100, 96, 80, 'tint2');
+    o += plane(120, 100, 16, [-6, 6], [-5, 5]);
+    if (k === 'order') {
+      const A = P(2, 4), B = P(4, 2), C = P(-3, -3);
+      return o + ln([A[0], 100], A, 'diag') + ln([120, A[1]], A, 'diag') + ln([B[0], 100], B, 'diag') + ln([120, B[1]], B, 'diag') +
+        pdot(A) + pdot(B, 'pd v') + pdot(C, 'pd k') + txt(A[0], A[1] - 9, '(2, 4)', 'vx sm') + txt(B[0] + 7, B[1] + 4, '(4, 2)', 'vx sm l') + txt(C[0] - 7, C[1] + 4, '(−3, −3)', 'vx sm r');
+    }
+    const Q = [['I', '(+, +)', 3, 2], ['II', '(−, +)', -3, 2], ['III', '(−, −)', -3, -2], ['IV', '(+, −)', 3, -2]];
+    o += Q.map(([n, sg, x, y]) => txt(P(x, y)[0], P(x, y)[1] + 4, n, 'vx num') + (k ? txt(P(x, y)[0], P(x, y)[1] + 22, sg, 'vx sm') : '')).join('');
+    if (k) o += pdot(P(-5, 3), 'pd k') + txt(P(-5, 3)[0], P(-5, 3)[1] - 9, 'Q (−5, 3)', 'vx sm') + pdot(P(3, -5), 'pd k') + txt(P(3, -5)[0] + 7, P(3, -5)[1] + 4, 'S (3, −5)', 'vx sm l');
+    return o;
+  },
+  axisdist: k => {
+    const { P } = cp(32, 172, 16);
+    let o = plane(32, 172, 16, [0, 11], [0, 9]);
+    const h1 = P(1, 6), h2 = P(8, 6), v1 = P(10, 1), v2 = P(10, 8);
+    if (k !== 'vert') o += ln(h1, h2, 'hs') + pdot(h1) + pdot(h2) + (k ? txt(h1[0], h1[1] - 9, '(1, 6)', 'vx sm') + txt(h2[0], h2[1] - 9, '(8, 6)', 'vx sm') + txt((h1[0] + h2[0]) / 2, h1[1] + 20, '|8 − 1| = 7', 'lbl') : '');
+    if (k !== 'horiz') o += ln(v1, v2, 'hs2') + pdot(v1, 'pd v') + pdot(v2, 'pd v') + (k ? txt(v2[0] - 7, v2[1] + 4, '(10, 8)', 'vx sm r') + txt(v1[0] - 7, v1[1] + 4, '(10, 1)', 'vx sm r') + txt(v1[0] - 7, (v1[1] + v2[1]) / 2 + 4, '|8 − 1| = 7', 'lbl r') : '');
+    return o;
+  },
+  distform: k => {
+    const { P } = cp(30, 176, 18);
+    let o = plane(30, 176, 18, [0, 10], [0, 8]);
+    if (k === 'origin') {
+      const O = P(0, 0), F = P(6, 0), Q = P(6, 8);
+      return o + ln(O, F, 'hs') + ln(F, Q, 'hs2') + ln(O, Q, 'hyp') + rightA(F, O, Q, 9, 'ra') + pdot(Q, 'pd k') + pdot(O, 'pd k') +
+        txt(Q[0] + 7, Q[1] + 4, 'P (6, 8)', 'vx sm l') + txt((O[0] + F[0]) / 2, F[1] - 7, '6', 'lbl') + txt(F[0] + 8, (F[1] + Q[1]) / 2, '8', 'lbl l') + txt(80, 96, 'OP = 10', 'lbl r');
+    }
+    const A = P(3, 4), C = P(3, 1), D = P(7, 1);
+    o += pg([A, C, D], 'tint') + ln(C, D, 'hs') + ln(A, C, 'hs2') + ln(A, D, 'hyp') + rightA(C, A, D, 9, 'ra') + pdot(A, 'pd k') + pdot(D, 'pd k');
+    if (k) o += txt(A[0] - 6, A[1] - 8, 'A (3, 4)', 'vx sm') + txt(D[0] + 7, D[1] + 4, 'D (7, 1)', 'vx sm l') + txt(C[0] - 6, C[1] + 4, 'C', 'vx sm r') +
+      txt((C[0] + D[0]) / 2 - 8, C[1] - 7, '4', 'lbl') + txt(A[0] - 8, (A[1] + C[1]) / 2 + 4, '3', 'lbl r') + txt(130, 124, 'AD = 5', 'lbl l');
+    return o;
+  },
+  reflect: k => {
+    const ox = 120, oy = 100, u = 10.5, { P } = cp(ox, oy, u);
+    let o = plane(ox, oy, u, [-10, 10], [-7, 7], false);
+    const T = [[3, 4], [7, 1], [9, 6]];
+    const img = k === 'xaxis' ? T.map(([x, y]) => [x, -y]) : T.map(([x, y]) => [-x, y]);
+    const t1 = T.map(p => P(...p)), t2 = img.map(p => P(...p));
+    o += k === 'xaxis' ? ln([14, oy], [226, oy], 'mirror') : ln([ox, 22], [ox, 178], 'mirror');
+    o += t1.map((p, i) => ln(p, t2[i], 'diag')).join('') + pg(t1, 'tint') + pg(t1, 'hs') + pg(t2, 'tint2') + pg(t2, 'hs2');
+    if (!k) return o;
+    if (k === 'xaxis') { const off = [[-11, 0], [12, 0], [12, 0]];
+      return o + t1.map((p, i) => vlabel(p, off[i], ['A', 'D', 'M'][i])).join('') + t2.map((p, i) => vlabel(p, off[i], ['A′', 'D′', 'M′'][i])).join(''); }
+    return o + names(t1, ['A', 'D', 'M']) + names(t2, ['A′', 'D′', 'M′']);
+  },
+  midpt: k => {
+    const { P } = cp(30, 176, 18);
+    let o = plane(30, 176, 18, [0, 10], [0, 8]);
+    if (k === 'tri') {
+      const A = P(1, 1), B = P(10, 7), Pp = P(4, 3), Q = P(7, 5);
+      return o + ln(A, B, 'hs') + ticks(A, Pp, 1) + ticks(Pp, Q, 1) + ticks(Q, B, 1) + pdot(A) + pdot(B) + pdot(Pp, 'pd v') + pdot(Q, 'pd v') +
+        txt(A[0] + 6, A[1] + 16, 'A (1, 1)', 'vx sm l') + txt(B[0] - 4, B[1] - 9, 'B (10, 7)', 'vx sm r') + txt(Pp[0] + 9, Pp[1] + 14, 'P (4, 3)', 'vx sm l') + txt(Q[0] + 9, Q[1] + 14, 'Q (7, 5)', 'vx sm l');
+    }
+    const S = P(1, 1), T = P(9, 7), M = P(5, 4);
+    o += ln(S, T, 'hs') + ticks(S, M, 1) + ticks(M, T, 1) + (k ? ln([M[0], 176], M, 'diag') + ln([30, M[1]], M, 'diag') : '') + pdot(S) + pdot(T) + pdot(M, 'pd v');
+    if (k) o += txt(S[0] + 6, S[1] + 16, 'S (1, 1)', 'vx sm l') + txt(T[0] - 6, T[1] - 9, 'T (9, 7)', 'vx sm r') + txt(M[0] + 9, M[1] + 14, 'M (5, 4)', 'vx sm l');
+    return o;
+  },
+  collin: k => {
+    const { P } = cp(74, 112, 10);
+    let o = plane(74, 112, 10, [-5, 14], [-7, 9]);
+    const M = P(-3, -4), A = P(0, 0), G = P(6, 8);
+    o += ln(M, A, 'hs') + ln(A, G, 'hs2') + pdot(M) + pdot(A, 'pd k') + pdot(G, 'pd v');
+    if (k) o += txt(M[0], M[1] + 19, 'M (−3, −4)', 'vx sm') + txt(A[0] + 8, A[1] + 12, 'A (0, 0)', 'vx sm l') + txt(G[0] + 8, G[1] + 4, 'G (6, 8)', 'vx sm l') +
+      txt((M[0] + A[0]) / 2 - 7, (M[1] + A[1]) / 2, '5', 'lbl r') + txt((A[0] + G[0]) / 2 - 7, (A[1] + G[1]) / 2, '10', 'lbl r') + txt(176, 150, '5 + 10 = 15', 'lbl');
+    return o;
+  },
+  circ: k => {
+    if (k === 'two') {
+      const A = [75, 107.5], B = [157.5, 63.5];
+      return `<circle cx="${A[0]}" cy="${A[1]}" r="44" class="c1"/><circle cx="${B[0]}" cy="${B[1]}" r="55" class="c2"/>` + ln(A, B, 'hyp') + pdot(A) + pdot(B, 'pd v') +
+        txt(A[0] - 8, A[1] + 4, 'A', 'vx sm r') + txt(B[0] + 8, B[1] + 4, 'B', 'vx sm l') + txt(124, 101, 'd = 170', 'lbl l') + txt(75, 170, 'r₁ = 80', 'vx sm') + txt(196, 140, 'r₂ = 100', 'vx sm');
+    }
+    const { P } = cp(120, 100, 10);
+    let o = plane(120, 100, 10, [-10, 10], [-9, 9], false) + `<circle cx="120" cy="100" r="${r1(Math.sqrt(65) * 10)}" class="c1"/>`;
+    const on = [[1, -8, 'A', 'l'], [-4, 7, 'B', 'l'], [-7, -4, 'C', 'r']];
+    o += on.map(([x, y, n, s]) => pdot(P(x, y)) + (k ? txt(P(x, y)[0] + (s === 'l' ? 7 : -7), P(x, y)[1] + (y > 0 ? -3 : 12), n, 'vx sm ' + s) : '')).join('');
+    o += pdot(P(-5, 6), 'pd v') + pdot(P(0, 9), 'pd k');
+    if (k) o += txt(P(-5, 6)[0] - 7, P(-5, 6)[1] + 8, 'D', 'vx sm r') + txt(P(0, 9)[0] + 7, P(0, 9)[1] + 4, 'E', 'vx sm l') + ln([120, 100], P(1, -8), 'diag') + txt(138, 140, '√65', 'lbl l') + pdot([120, 100], 'pd k');
+    return o;
+  },
+  sqr: k => {
+    const { P } = cp(120, 100, 24);
+    let o = plane(120, 100, 24, [-3, 3], [-3, 3]);
+    const Q = [P(2, 1), P(-1, 2), P(-2, -1), P(1, -2)];
+    o += pg(Q, 'tint2') + (k ? ln(Q[0], Q[2], 'hs') + ln(Q[1], Q[3], 'hs') + ticks(Q[0], Q[2], 2, 'tk', .3) + ticks(Q[1], Q[3], 2, 'tk', .3) : '') +
+      pg(Q, 'hs2') + sides(Q).map(([a, b]) => ticks(a, b, 1)).join('') + Q.map(p => pdot(p, 'pd k')).join('');
+    return o + (k ? names(Q, ['A', 'B', 'C', 'D']) : '');
+  }
+};
+
+// ---------- Ch 1 Coordinates: content ----------
+const COORDS = [
+ { id:'axes', tag:'Basics', name:'Axes and Origin', vars:'x-axis (horizontal), y-axis (vertical), origin O', draw:'axes',
+   leg: k => k === 'onaxis' ? '<span><i class="sw on"></i>On the x-axis: y = 0</span><span><i class="sw vol"></i>On the y-axis: x = 0</span>' : '<span>Right and up: +</span><span>Left and down: −</span>',
+   tabs:[
+    {k:'origin', short:'Origin', full:'Where the axes meet', eq:'O = (0, 0)',
+     explain:'Two number lines at right angles make the coordinate plane (also called the Cartesian plane or xy-plane): the horizontal <b>x-axis</b> and the vertical <b>y-axis</b>. They meet at the <b>origin</b> O. Distances to the right of O or upwards are positive; to the left or downwards are negative. A point is written P (x, y): x first, then y.',
+     ex:{given:'Point B is on the x-axis, 4.5 units to the right of O', steps:['Right of O, so x = +4.5','On the x-axis, so y = 0'], ans:'B = (4.5, 0)'}},
+    {k:'onaxis', short:'On an axis', full:'Points on the axes', eq:'x-axis: (x, 0)    y-axis: (0, y)',
+     explain:'A point on the x-axis is at height 0, so its y-coordinate is 0. A point on the y-axis has x-coordinate 0. Only the origin lies on both axes.',
+     ex:{given:'G is on the y-axis, 4.5 units below O', steps:['On the y-axis, so x = 0','Below O, so y = −4.5'], ans:'G = (0, −4.5)'}}]},
+ { id:'quadrants', tag:'Class 9', name:'Quadrants', vars:'The axes divide the plane into four quadrants', draw:'quadrants',
+   leg: k => k === 'order' ? '<span>Dashed lines show the distance to each axis</span>' : '<span>Numbered anticlockwise from the top right</span>',
+   tabs:[
+    {k:'signs', short:'Signs', full:'Signs in each quadrant', eq:'I (+, +)   II (−, +)   III (−, −)   IV (+, −)',
+     explain:'The signs of x and y tell you the quadrant at once. A point that lies on an axis is not in any quadrant.<br>x is the perpendicular distance of the point from the y-axis, and y is its perpendicular distance from the x-axis.',
+     ex:{given:'Q (−5, 3) and S (3, −5)', steps:['Q: x negative, y positive','S: x positive, y negative'], ans:'Q is in Quadrant II, S is in Quadrant IV'}},
+    {k:'order', short:'Order', full:'Order matters', eq:'(x, y) = (y, x)  only if  x = y',
+     explain:'Swapping the coordinates usually moves the point: (2, 4) and (4, 2) are different points. If x = y, swapping changes nothing, so (−3, −3) stays where it is.',
+     ex:{given:'Do P (2, 4) and Q (4, 2) coincide?', steps:['x-coordinates: 2 ≠ 4','So the points are in different places'], ans:'No, (2, 4) ≠ (4, 2)'}}]},
+ { id:'axis-distance', tag:'Basics', name:'Distance Along a Line', vars:'Two points on a line parallel to an axis', draw:'axisdist',
+   leg: () => '<span><i class="sw on"></i>Same y: subtract the x values</span><span><i class="sw vol"></i>Same x: subtract the y values</span>',
+   tabs:[
+    {k:'horiz', short:'Same y', full:'Points (x₁, y) and (x₂, y)', eq:'d = |x₂ − x₁|',
+     explain:'When two points have the same y-coordinate they lie on a horizontal line. The distance is the difference of the x-coordinates, taken as a positive number (the absolute value).',
+     ex:{given:'(−3, 2) and (5, 2)', steps:['Same y, so subtract the x values','|5 − (−3)| = |8|'], ans:'Distance = 8 units'}},
+    {k:'vert', short:'Same x', full:'Points (x, y₁) and (x, y₂)', eq:'d = |y₂ − y₁|',
+     explain:'When two points have the same x-coordinate they lie on a vertical line. The distance is the difference of the y-coordinates, taken as a positive number.',
+     ex:{given:'Bathroom door ends B₁ (0, 1.5) and B₂ (0, 4)', steps:['Same x, so subtract the y values','|4 − 1.5|'], ans:'The door is 2.5 units wide'}}]},
+ { id:'distance-formula', tag:'Class 9', name:'Distance Formula', vars:'A (x₁, y₁) and D (x₂, y₂)', draw:'distform',
+   leg: () => '<span><i class="sw on"></i>Change in x</span><span><i class="sw vol"></i>Change in y</span><span>Pink = the distance</span>',
+   tabs:[
+    {k:'dist', short:'Two points', full:'Distance between two points', eq:'d = √[(x₂ − x₁)² + (y₂ − y₁)²]',
+     explain:'Make a right triangle with the segment as its hypotenuse. Its horizontal side is x₂ − x₁ and its vertical side is y₂ − y₁. The Baudhāyana–Pythagoras theorem gives the length. Negative differences do not matter because they are squared.',
+     ex:{given:'A (3, 4) and D (7, 1)', steps:['x₂ − x₁ = 7 − 3 = 4','y₂ − y₁ = 1 − 4 = −3','AD = √(4² + 3²) = √25'], ans:'AD = 5 units'}},
+    {k:'origin', short:'From O', full:'Distance from the origin', eq:'OP = √(x² + y²)',
+     explain:'Use (0, 0) as the first point in the distance formula.',
+     ex:{given:'P (6, 8)', steps:['OP = √(6² + 8²)','= √(36 + 64) = √100'], ans:'OP = 10 units'}}]},
+ { id:'reflection', tag:'Class 9', name:'Reflection in an Axis', vars:'The mirror image of a point or shape', draw:'reflect',
+   leg: () => '<span><i class="sw on"></i>Original</span><span><i class="sw vol"></i>Mirror image</span><span>Pink dashes = mirror</span>',
+   tabs:[
+    {k:'yaxis', short:'In y-axis', full:'Reflection in the y-axis', eq:'(x, y) → (−x, y)',
+     explain:'Reflecting in the y-axis flips a point to the other side: x changes sign and y stays the same. Lengths do not change, so a reflected triangle has the same side lengths.',
+     ex:{given:'△ADM with A (3, 4), D (7, 1), M (9, 6)', steps:['Change the sign of each x','A′ (−3, 4), D′ (−7, 1), M′ (−9, 6)','A′D′ = √(4² + 3²) = 5 = AD'], ans:'Same size and shape, flipped left to right'}},
+    {k:'xaxis', short:'In x-axis', full:'Reflection in the x-axis', eq:'(x, y) → (x, −y)',
+     explain:'Reflecting in the x-axis flips a point upside down: y changes sign and x stays the same. Lengths are again unchanged.',
+     ex:{given:'A (3, 4)', steps:['Keep x = 3','Change y to −4'], ans:'Image A′ = (3, −4)'}}]},
+ { id:'mid-point-trisection', tag:'Tricky', name:'Mid-point and Trisection', vars:'Points that cut a segment into equal parts', draw:'midpt',
+   leg: k => k === 'tri' ? '<span>Three equal parts</span>' : '<span>Dashed lines: halfway in x and halfway in y</span>',
+   tabs:[
+    {k:'mid', short:'Mid-point', full:'Mid-point of a segment', eq:'M = ((x₁ + x₂) ÷ 2, (y₁ + y₂) ÷ 2)',
+     explain:'The mid-point is halfway along in both directions, so each of its coordinates is the average of the two ends.',
+     ex:{given:'M (−7, 1) is the mid-point of A (3, −4) and B (x, y)', steps:['(3 + x) ÷ 2 = −7, so x = −17','(−4 + y) ÷ 2 = 1, so y = 6'], ans:'B = (−17, 6)'}},
+    {k:'tri', short:'Trisection', full:'Points of trisection', eq:'P = ((2x₁ + x₂) ÷ 3, (2y₁ + y₂) ÷ 3)',
+     explain:'P and Q cut AB into three equal parts. P is one third of the way from A. Q is two thirds of the way: Q = ((x₁ + 2x₂) ÷ 3, (y₁ + 2y₂) ÷ 3).',
+     ex:{given:'A (4, 7) and B (16, −2)', steps:['P = ((8 + 16) ÷ 3, (14 − 2) ÷ 3)','Q = ((4 + 32) ÷ 3, (7 − 4) ÷ 3)'], ans:'P = (8, 4), Q = (12, 1)'}}]},
+ { id:'collinear', tag:'Tricky', name:'Same Straight Line?', vars:'Three points M, A and G', draw:'collin',
+   leg: () => '<span><i class="sw on"></i>MA = 5</span><span><i class="sw vol"></i>AG = 10</span>',
+   tabs:[
+    {k:'col', short:'Collinear', full:'Checking with distances', eq:'MA + AG = MG',
+     explain:'Find all three distances. If the two shorter ones add up exactly to the longest, the points lie on one straight line (they are <b>collinear</b>). If the sum is bigger, the points make a triangle.',
+     ex:{given:'M (−3, −4), A (0, 0), G (6, 8)', steps:['MA = √(9 + 16) = 5','AG = √(36 + 64) = 10','MG = √(81 + 144) = 15, and 5 + 10 = 15'], ans:'Yes, they lie on one straight line'}}]},
+ { id:'points-and-circles', tag:'Tricky', name:'Points and Circles', vars:'Circle with centre O and radius r', draw:'circ',
+   leg: k => k === 'two' ? '<span>Pink = distance between the centres</span>' : '<span><i class="sw on"></i>On</span><span><i class="sw vol"></i>Inside</span><span>Pink E = outside</span>',
+   tabs:[
+    {k:'one', short:'On or not', full:'Is the point on the circle?', eq:'OP = r  ⇒  on the circle',
+     explain:'Find the distance OP of the point from the centre. If OP = r the point is <b>on</b> the circle; if OP &lt; r it is <b>inside</b>; if OP &gt; r it is <b>outside</b>.',
+     ex:{given:'Circle K with centre O; A (1, −8), D (−5, 6), E (0, 9)', steps:['OA = √(1 + 64) = √65, so r = √65','OD = √(25 + 36) = √61, less than √65','OE = 9 = √81, more than √65'], ans:'D is inside, E is outside'}},
+    {k:'two', short:'Two circles', full:'Do two circles meet?', eq:'d < r₁ + r₂  ⇒  they cross',
+     explain:'Find the distance d between the two centres. If d &gt; r₁ + r₂ the circles are apart. If d = r₁ + r₂ they just touch. If d &lt; r₁ + r₂ (and more than the difference of the radii) they cross each other.',
+     ex:{given:'Centres A (100, 150), B (250, 230); radii 80 and 100', steps:['d = √(150² + 80²) = √28900 = 170','r₁ + r₂ = 180, and 170 &lt; 180'], ans:'The circles intersect'}}]},
+ { id:'square-check', tag:'Tricky', name:'Is it a Square?', vars:'Four points A, B, C, D', draw:'sqr',
+   leg: () => '<span>Same marks = equal lengths</span>',
+   tabs:[
+    {k:'sq', short:'Square test', full:'Using the distance formula', eq:'4 equal sides  +  equal diagonals',
+     explain:'Use the distance formula on all four sides and both diagonals. Four equal sides make a rhombus. If the diagonals are equal too, it is a square. Its area is side².',
+     ex:{given:'A (2, 1), B (−1, 2), C (−2, −1), D (1, −2)', steps:['AB = BC = CD = DA = √(9 + 1) = √10','AC = BD = √(16 + 4) = √20','Area = (√10)²'], ans:'ABCD is a square of area 10 sq units'}}]}
+];
+
 // ---------- Chapters ----------
 const listRev = ch => `<div class="tbl"><table class="rev8">
       <thead><tr><th>Topic</th><th>Key results</th></tr></thead>
@@ -826,6 +1037,13 @@ const listRev = ch => `<div class="tbl"><table class="rev8">
     </table></div>
     ${ch.revNote ? `<div class="note" style="margin-top:16px">${ch.revNote}</div>` : ''}`;
 const CHAPTERS = [
+  { id:'ch1', no:1, cls:'Class 9', name:'Coordinate Geometry', unit:'Topic', count:'topics', items:COORDS, draws:CDRAW,
+    hint:'From Ganita Manjari Ch 1, <i>Orienting Yourself: The Use of Coordinates</i>. <b>Class 9</b> = exam focus · <b>Basics</b> = used in every question · <b>Tricky</b> = the starred end-of-chapter problems.',
+    revMark:'O = (0, 0)<br>(x, y) → (−x, y)<br>d² = Δx² + Δy²',
+    legend: (k, s) => s.leg ? s.leg(k) : '',
+    rev: ch => listRev(ch),
+    revNote: '<b>Chapter summary:</b> (+, +) in Quadrant I, (−, +) in II, (−, −) in III, (+, −) in IV. Points on the x-axis are (x, 0); points on the y-axis are (0, y).',
+    revSub: 'Tap a topic to open its picture.' },
   { id:'ch8', no:8, name:'Quadrilaterals', unit:'Topic', count:'topics', items:QUADS, draws:QDRAW,
     hint:'Tap a topic to see its theorem with a diagram. <b>Class 9</b> = exam focus · <b>Basics</b> = used inside questions · <b>Tricky</b> = common exam traps.',
     revMark:'∠ sum = 360°<br>EF = ½ BC<br>AC ⊥ BD',
@@ -892,7 +1110,7 @@ function home(openId) {
     </button>
     ${open ? `<p class="hint">${ch.hint}</p>
     <div class="grid">${cards}
-      <button class="card rev" data-go="rev-${ch.id}" aria-label="Quick revision for ${ch.name}" style="--i:${ch.items.length}">
+      <button class="card rev${ch.items.length % 2 ? '' : ' wide'}" data-go="rev-${ch.id}" aria-label="Quick revision for ${ch.name}" style="--i:${ch.items.length}">
         <span class="num">All ${ch.count}</span>
         <span class="rev-mark">${ch.revMark}</span>
         <h3>Quick Revision</h3>

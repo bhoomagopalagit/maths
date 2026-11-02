@@ -4,6 +4,7 @@ A simple maths formula app for school students.
 
 ## Chapters
 
+- **Ch 1 Coordinate Geometry** (Ganita Manjari): axes, quadrants, distance formula, reflection, mid-point and trisection, collinear points, circles, square check
 - **Ch 8 Quadrilaterals**: Angle Sum, Parallelogram, Rectangle, Rhombus, Square, Trapezium, Mid-point Theorem, Mid-points of a Quadrilateral
 - **Ch 8 Sequences and Series**: AP, GP, AM and GM, special series
 - **Ch‑14 Surface Area and Volume**: Cube, Cuboid, Cylinder, Hollow Cylinder, Cone, Sphere, Hemisphere, Spherical Shell
