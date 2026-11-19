@@ -326,10 +326,10 @@ const DRAW = {
 const SHAPES = [
  { id:'cube', tag:'Basics', name:'Cube', vars:'<span class="m">a</span> = length of each side', draw:'cube',
    tabs:[
-    {k:'lsa', short:'LSA', full:'Lateral Surface Area', lhs:'LSA', eq:'4a<sup>2</sup>',
+    {k:'lsa', short:'LSA', full:'Lateral Surface Area (4 side walls only)', lhs:'LSA', eq:'4a<sup>2</sup>',
      explain:'A cube has 6 square faces, and each face has area <span class="m">a</span> × <span class="m">a</span> = <span class="m">a</span>². "Lateral" means only the 4 side walls, leaving out the top and the bottom. So LSA = 4 × <span class="m">a</span>².',
      ex:{given:'Side a = 5 cm', steps:['LSA = 4a²','= 4 × 5 × 5','= 4 × 25'], ans:'LSA = 100 cm²'}},
-    {k:'tsa', short:'TSA', full:'Total Surface Area', lhs:'TSA', eq:'6a<sup>2</sup>',
+    {k:'tsa', short:'TSA', full:'Total Surface Area (all 6 faces)', lhs:'TSA', eq:'6a<sup>2</sup>',
      explain:'Total means every face: 4 side walls plus the top and the bottom. That is 6 equal squares, so TSA = 6 × <span class="m">a</span>².',
      ex:{given:'Side a = 5 cm', steps:['TSA = 6a²','= 6 × 25'], ans:'TSA = 150 cm²'}},
     {k:'vol', short:'Volume', full:'Volume', lhs:'V', eq:'a<sup>3</sup>',
@@ -338,10 +338,10 @@ const SHAPES = [
    note:'<b>Diagonal of a cube</b> = √3 <span class="m">a</span>'},
  { id:'cuboid', tag:'Basics', name:'Cuboid', vars:'<span class="m">l</span> = length, <span class="m">b</span> = breadth, <span class="m">h</span> = height', draw:'cuboid',
    tabs:[
-    {k:'lsa', short:'LSA', full:'Lateral Surface Area', lhs:'LSA', eq:'2h(l + b)',
+    {k:'lsa', short:'LSA', full:'Lateral Surface Area (4 side walls only)', lhs:'LSA', eq:'2h(l + b)',
      explain:'The 4 side walls are two rectangles of <span class="m">l</span> × <span class="m">h</span> and two of <span class="m">b</span> × <span class="m">h</span>. Adding them: 2<span class="m">lh</span> + 2<span class="m">bh</span> = 2<span class="m">h</span>(<span class="m">l</span> + <span class="m">b</span>). Think of it as the perimeter of the base × height (like painting the 4 walls of a room).',
      ex:{given:'l = 10 cm, b = 6 cm, h = 4 cm', steps:['LSA = 2h(l + b)','= 2 × 4 × (10 + 6)','= 8 × 16'], ans:'LSA = 128 cm²'}},
-    {k:'tsa', short:'TSA', full:'Total Surface Area', lhs:'TSA', eq:'2(lb + bh + hl)',
+    {k:'tsa', short:'TSA', full:'Total Surface Area (all 6 faces)', lhs:'TSA', eq:'2(lb + bh + hl)',
      explain:'A cuboid has 3 pairs of matching faces: top and bottom (<span class="m">l</span> × <span class="m">b</span>), front and back (<span class="m">l</span> × <span class="m">h</span>), left and right (<span class="m">b</span> × <span class="m">h</span>). Add one of each pair and double it.',
      ex:{given:'l = 10 cm, b = 6 cm, h = 4 cm', steps:['TSA = 2(lb + bh + hl)','= 2(60 + 24 + 40)','= 2 × 124'], ans:'TSA = 248 cm²'}},
     {k:'vol', short:'Volume', full:'Volume', lhs:'V', eq:'l × b × h',
