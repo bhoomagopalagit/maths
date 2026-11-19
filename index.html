@@ -254,8 +254,8 @@ const DRAW = {
   cuboid: m => box(m, [35,85],[165,85],[165,165],[35,165], 40,-35,
     tx(100,186,'l') + tx(20,130,'h') + tx(196,158,'b')),
   cylinder: m =>
-    el(120,160,60,16, fc(m,['tsa'])+' nost') + pa('M60,160 A60,16 0 0 1 180,160','eh') +
-    pa('M60,50 L60,160 A60,16 0 0 0 180,160 L180,50 A60,16 0 0 1 60,50 Z', fc(m,['lsa','tsa'])+' st') +
+    el(120,160,60,16, fc(m,['tsa','tsa1'])+' nost') + pa('M60,160 A60,16 0 0 1 180,160','eh') +
+    pa('M60,50 L60,160 A60,16 0 0 0 180,160 L180,50 A60,16 0 0 1 60,50 Z', fc(m,['lsa','tsa','tsa1'])+' st') +
     el(120,50,60,16, fc(m,['tsa'])+' st') +
     ln([120,50],[180,50],'dim') + dot(120,50) + tx(150,44,'r') +
     ln([200,50],[200,160],'dim') + tx(212,110,'h'),
@@ -353,7 +353,10 @@ const SHAPES = [
     {k:'lsa', short:'CSA', full:'Curved Surface Area', lhs:'CSA', eq:'2πrh',
      explain:'Peel the label off a can and open it flat: it becomes a rectangle. Its length is the circumference of the base, 2π<span class="m">r</span>, and its width is the height <span class="m">h</span>. Area = 2π<span class="m">r</span> × <span class="m">h</span>.',
      ex:{given:'r = 7 cm, h = 10 cm (π = 22/7)', steps:['CSA = 2πrh','= 2 × 22/7 × 7 × 10','= 44 × 10'], ans:'CSA = 440 cm²'}},
-    {k:'tsa', short:'TSA', full:'Total Surface Area', lhs:'TSA', eq:'2πr(r + h)',
+    {k:'tsa1', short:'1 end', full:'Total Surface Area (covered at one end)', lhs:'TSA', eq:'πr(2h + r)',
+     explain:'Like a glass or a bucket: closed at the bottom, open at the top. Add only one circular end to the curved surface: 2π<span class="m">rh</span> + π<span class="m">r</span>². Taking π<span class="m">r</span> common gives π<span class="m">r</span>(2<span class="m">h</span> + <span class="m">r</span>).',
+     ex:{given:'r = 7 cm, h = 10 cm', steps:['TSA = πr(2h + r)','= 22/7 × 7 × (20 + 7)','= 22 × 27'], ans:'TSA = 594 cm²'}},
+    {k:'tsa', short:'TSA', full:'Total Surface Area (covered at both ends)', lhs:'TSA', eq:'2πr(r + h)',
      explain:'Add the two circular ends (top and bottom) to the curved surface: 2π<span class="m">rh</span> + 2π<span class="m">r</span>². Taking 2π<span class="m">r</span> common gives 2π<span class="m">r</span>(<span class="m">r</span> + <span class="m">h</span>).',
      ex:{given:'r = 7 cm, h = 10 cm', steps:['TSA = 2πr(r + h)','= 2 × 22/7 × 7 × (7 + 10)','= 44 × 17'], ans:'TSA = 748 cm²'}},
     {k:'vol', short:'Volume', full:'Volume', lhs:'V', eq:'πr<sup>2</sup>h',
@@ -372,10 +375,10 @@ const SHAPES = [
      ex:{given:'R = 7 cm, r = 3.5 cm, h = 10 cm', steps:['V = πh(R² − r²)','= 22/7 × 10 × 36.75'], ans:'V = 1155 cm³'}}]},
  { id:'cone', tag:'Class 9', name:'Cone', vars:'<span class="m">r</span> = radius, <span class="m">h</span> = height, <span class="m">l</span> = slant height', draw:'cone',
    tabs:[
-    {k:'lsa', short:'CSA', full:'Curved Surface Area', lhs:'CSA', eq:'πrl',
+    {k:'lsa', short:'CSA', full:'Curved Surface Area (open, no base)', lhs:'CSA', eq:'πrl',
      explain:'Cut a cone open along its side and it flattens into a sector of a circle with radius <span class="m">l</span>. Its area works out to π<span class="m">rl</span>. Note it uses the slant height <span class="m">l</span>, not the height <span class="m">h</span>.',
      ex:{given:'r = 7 cm, h = 24 cm', steps:['l = √(7² + 24²) = √625 = 25 cm','CSA = πrl = 22/7 × 7 × 25'], ans:'CSA = 550 cm²'}},
-    {k:'tsa', short:'TSA', full:'Total Surface Area', lhs:'TSA', eq:'πr(l + r)',
+    {k:'tsa', short:'TSA', full:'Total Surface Area (base covered)', lhs:'TSA', eq:'πr(l + r)',
      explain:'Curved surface plus the circular base: π<span class="m">rl</span> + π<span class="m">r</span>² = π<span class="m">r</span>(<span class="m">l</span> + <span class="m">r</span>).',
      ex:{given:'r = 7 cm, l = 25 cm', steps:['TSA = πr(l + r)','= 22/7 × 7 × 32','= 22 × 32'], ans:'TSA = 704 cm²'}},
     {k:'vol', short:'Volume', full:'Volume', lhs:'V', eq:'⅓ πr<sup>2</sup>h',
@@ -1065,7 +1068,7 @@ const CHAPTERS = [
       <tbody>${ch.items.map(s => `<tr>
         <td><button data-go="${s.id}">${s.name}</button></td>
         <td class="f">${s.id === 'sphere' ? '4πr<sup>2</sup>' : s.id === 'spherical-shell' ? '4πR<sup>2</sup> (outer)' : cell(s, ['lsa'])}</td>
-        <td class="f">${s.id === 'spherical-shell' ? '—' : cell(s, ['tsa'])}</td>
+        <td class="f">${s.id === 'spherical-shell' ? '—' : cell(s, ['tsa'])}${s.tabs.some(x => x.k === 'tsa1') ? `<br><small>1 end: ${cell(s, ['tsa1'])}</small>` : ''}</td>
         <td class="f">${cell(s, ['vol'])}</td></tr>`).join('')}</tbody>
     </table></div>
     <div class="note" style="margin-top:16px"><b>Units:</b> area in cm² or m², volume in cm³ or m³. 1 m³ = 1000 litres, 1 litre = 1000 cm³.</div>`;
